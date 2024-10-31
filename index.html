@@ -1,28 +1,45 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>       <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>          <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>          <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>       <html class="no-js"> <![endif]-->
-
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>Tetris Game</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <style>
+            body {
+                background-color: gray;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            #game-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            #game-canvas {
+                border: 2px solid white; /* Border around the game */
+                background-color: black; /* Set game background to black */
+            }
+            #scoreboard {
+                color: white; /* Score text color */
+                font-size: 24px; /* Increase font size for better visibility */
+                margin-top: 10px; /* Space between game and score */
+                text-align: center; /* Center the score text */
+            }
+        </style>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.>
-        <![endif]-->
-        <canvas id="game-canvas" width="300" height="600"></canvas>
-        <h2 id = "Scoreboard">Score: 0</h2>
+        <div id="game-container">
+            <canvas id="game-canvas" width="300" height="600"></canvas>
+            <h2 id="scoreboard">Score: 0</h2>
+        </div>
         <script src="./constants.js"></script>
         <script src="./piece.js"></script>
         <script src="./gamemodel.js"></script>
         <script src="./tetris.js"></script>
     </body>
 </html>
-
