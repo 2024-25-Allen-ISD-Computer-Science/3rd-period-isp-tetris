@@ -4,7 +4,8 @@ class GameModel {
         this.fallingPiece = null;
         this.grid = this.makeStartingGrid();
     }
-
+ 
+ 
     makeStartingGrid() {
         let grid = [];
         for (var i = 0; i < ROWS; i++) {
@@ -15,7 +16,8 @@ class GameModel {
         }
         return grid;
     }
-
+ 
+ 
     collision(x, y) {
         const shape = this.fallingPiece.shape;
         const n = shape.length;
@@ -36,7 +38,8 @@ class GameModel {
         }
         return false;
     }
-
+ 
+ 
     renderGameState() {
         this.ctx.clearRect(0, 0, COLS, ROWS); // Clear the canvas before rendering
         for (let i = 0; i < this.grid.length; i++) {
@@ -48,12 +51,14 @@ class GameModel {
                 }
             }
         }
-
+ 
+ 
         if (this.fallingPiece !== null) {
             this.fallingPiece.renderPiece();
         }
     }
-
+ 
+ 
     moveDown() {
         if (this.fallingPiece === null) {
             this.renderGameState();
@@ -71,7 +76,8 @@ class GameModel {
                     }
                 });
             });
-
+ 
+ 
             // check game over
             if (this.fallingPiece.y === 0) {
                 alert("Game over!");
@@ -83,12 +89,14 @@ class GameModel {
         }
         this.renderGameState();
     }
-
+ 
+ 
     move(right) {
         if (this.fallingPiece === null) {
             return;
         }
-
+ 
+ 
         let x = this.fallingPiece.x;
         let y = this.fallingPiece.y;
         if (right) {
@@ -104,7 +112,8 @@ class GameModel {
         }
         this.renderGameState();
     }
-
+ 
+ 
     rotate() {
         if (this.fallingPiece !== null) {
             let shape = this.fallingPiece.shape;
@@ -119,4 +128,5 @@ class GameModel {
         }
         this.renderGameState();
     }
-}
+ } 
+ 

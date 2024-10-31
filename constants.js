@@ -49,12 +49,12 @@ const SHAPES = [
 ];
 
 const COLORS = [
-    '#FF0C08', // Color for shape 1
-    '#FF6D08', // Color for shape 2
-    '#FFDA08', // Color for shape 3
-    '#30E70B', // Color for shape 4
-    '#0B72E7', // Color for shape 5
-    '#A80BE7', // Color for shape 6
-    '#F879A0'  // Color for shape 7
+    '#FF0C08', // shape 1
+    '#FF6D08', // shape 2
+    '#FFDA08', // shape 3
+    '#30E70B', // shape 4
+    '#0B72E7', // shape 5
+    '#A80BE7', // shape 6
+    '#F879A0'  // shape 7
 ];
 

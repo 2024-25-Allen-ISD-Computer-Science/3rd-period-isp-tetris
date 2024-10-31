@@ -1,9 +1,9 @@
 class Piece {
-    constructor(shape, ctx) {
+    constructor(shape, ctx, initialX = Math.floor(COLS / 2), initialY = 0) {
         this.shape = shape;
-        this.ctx = ctx; 
-        this.y = 0;
-        this.x = Math.floor(COLS / 2);
+        this.ctx = ctx;
+        this.y = initialY; // Allow setting the initial Y position
+        this.x = initialX; // Allow setting the initial X position
     }
 
     renderPiece() {
@@ -15,5 +15,10 @@ class Piece {
                 }
             });
         });
+    }
+
+    setPosition(x, y) {
+        this.x = x; // Set the X position
+        this.y = y; // Set the Y position
     }
 }
