@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Tetris Game</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="tetris.css"> <!-- Link to your CSS file -->
         <style>
             body {
                 background-color: gray;
@@ -33,6 +33,7 @@
         </style>
     </head>
     <body>
+        <button id="toggle-mode">Change Game Mode</button> <!-- Add the button here -->
         <div id="game-container">
             <canvas id="game-canvas" width="300" height="600"></canvas>
             <h2 id="scoreboard">Score: 0</h2>

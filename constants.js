@@ -2,7 +2,7 @@ const GAME_CLOCK = 1000;
 const BLOCK_SIDE_LENGTH = 30;
 const ROWS = 20;
 const COLS = 10;
-const SCORE_WORTH = 10;
+const SCORE_WORTH = 100;
 
 const SHAPES = [
     [

@@ -1,0 +1,13 @@
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: red; /* Randomize in JS */
+    pointer-events: none; /* Makes sure clicks go through */
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
+}
