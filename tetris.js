@@ -1,120 +1,262 @@
-// setup
-let canvas = document.getElementById("game-canvas");
-let scoreboard = document.getElementById("scoreboard");
-let ctx = canvas.getContext("2d");
-ctx.scale(BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
-let model = new GameModel(ctx);
+const canvas = document.getElementById("game-canvas");
+const ctx = canvas.getContext("2d");
 
+let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));  
+let currentPiece = null;
 let score = 0;
-let showTetrisMessage = false;
-let confettiParticles = [];
+let highScore = localStorage.getItem('highScore') || 0;
+let gameOver = false;
+let gameInterval = null;  // Track the game interval for consistent speed
 
-// Run the game state periodically based on GAME_CLOCK interval
-setInterval(() => {
-    newGameState();
-}, GAME_CLOCK);
-
-// Main game state function
-let newGameState = () => {
-    ctx.clearRect(0, 0, COLS, ROWS); // Clear canvas before each render
-    fullSend();
-
-    if (model.fallingPiece === null) {
-        const rand = Math.floor(Math.random() * SHAPES.length); // Randomize shape
-        const newPiece = new Piece(SHAPES[rand], ctx, Math.floor(COLS / 2), -1);
-        model.fallingPiece = newPiece;
-    }
-    model.moveDown();
-
-    drawConfetti(); // Render confetti particles each game state update
-
-    // Render "Tetris!" message if triggered by clearing exactly 4 rows
-    if (showTetrisMessage) {
-        ctx.font = "1px Arial"; // Smaller font for "Tetris!"
-        ctx.fillStyle = "yellow";
-        ctx.textAlign = "center";
-        ctx.fillText("Tetris!", COLS / 2, ROWS / 2);
-
-        // Display points scored in smaller font
-        ctx.font = "0.5px Arial"; // Smaller font for points
-        ctx.fillText("Score: 800", COLS / 2, (ROWS / 2) + 0.5); // Position it below "Tetris!"
-    }
-};
-
-// Handle row clearing and score updates
-const fullSend = () => {
-    const allFilled = (row) => row.every((x) => x > 0);
-
-    let rowsCleared = 0;
-    for (let i = 0; i < model.grid.length; i++) {
-        if (allFilled(model.grid[i])) {
-            rowsCleared++;
-            model.grid.splice(i, 1);
-            model.grid.unshift(new Array(COLS).fill(0));
-        }
-    }
-
-    if (rowsCleared === 4) {  // Trigger "Tetris!" message and confetti if exactly 4 rows cleared
-        score += 800;
-        showTetrisMessage = true;
-        createConfetti();
-
-        // Remove the message after a short delay, while allowing the game to continue
-        setTimeout(() => {
-            showTetrisMessage = false;
-            confettiParticles = [];  // Clear confetti after message disappears
-        }, 1000);
-    } else if (rowsCleared > 0) {  // Standard scoring for other clears
-        score += rowsCleared * SCORE_WORTH;
-    }
-
-    scoreboard.innerHTML = "Score: " + score;
-};
-
-// Create confetti particles
-const createConfetti = () => {
-    confettiParticles = Array.from({ length: 100 }, () => ({
-        x: Math.random() * COLS,               // Random x position across the width of the canvas
-        y: Math.random() * (ROWS / 2),         // Random y position in the top half of the canvas
-        size: Math.random() * 0.2 + 0.1,       // Random size for each particle
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        speedY: Math.random() * 0.5 + 0.5      // Speed for falling effect
-    }));
-};
-
-// Draw confetti particles on the canvas
-const drawConfetti = () => {
-    confettiParticles.forEach((particle) => {
-        ctx.fillStyle = particle.color;
-        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
-        particle.y += particle.speedY; // Update y position for falling
-
-        // Reset particle when it goes out of bounds
-        if (particle.y > ROWS) {
-            particle.y = Math.random() * (ROWS / 2) * -1; // Start from above the canvas
-            particle.x = Math.random() * COLS; // Random x position
-        }
-    });
-};
-
-// Handle keyboard inputs
-document.addEventListener("keydown", (e) => {
-    e.preventDefault();
-    switch (e.key) {
-        case "w":
-            model.rotate();
-            break;
-        case "d":
-            model.move(true);
-            break;
-        case "s":
-            model.moveDown();
-            break;
-        case "a":
-            model.move(false);
-            break;
-    }
+const resetButton = document.getElementById("reset-button"); // reset button
+resetButton.addEventListener("click", () => {  
+  startGame();  
 });
 
-// Start the game loop
-newGameState();
+// Confetti array to store the falling squares
+let confettiArray = [];
+let confettiSpawnTime = 0;  // Time when confetti should stop spawning
+let tetrisMessageShown = false;  // Flag to control Tetris message visibility
+let tetrisMessageStartTime = 0;  // Time when Tetris message should disappear
+
+// Draw the game board
+function drawBoard() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);  
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const color = board[row][col];
+      if (color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(col * BLOCK_SIDE_LENGTH, row * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+      }
+    }
+  }
+}
+
+// Draw the current piece on the board
+function drawPiece() {
+  if (!currentPiece) return;
+
+  currentPiece.shape.forEach((row, rIdx) => {
+    row.forEach((cell, cIdx) => {
+      if (cell) {
+        ctx.fillStyle = currentPiece.color;
+        ctx.fillRect((currentPiece.x + cIdx) * BLOCK_SIDE_LENGTH, (currentPiece.y + rIdx) * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+      }
+    });
+  });
+}
+
+// Generate a new piece
+function generatePiece() {
+  const idx = Math.floor(Math.random() * SHAPES.length);
+  return {
+    shape: SHAPES[idx],
+    color: COLORS[idx],
+    x: Math.floor(COLS / 2) - Math.floor(SHAPES[idx][0].length / 2),
+    y: 0
+  };
+}
+
+// Handle movement of the piece down
+function movePieceDown() {
+  if (gameOver) return;  // Prevent moving if the game is over
+  currentPiece.y++;
+  if (checkCollision()) {
+    currentPiece.y--;
+    placePiece();
+    clearLines();
+    currentPiece = generatePiece();
+    if (checkCollision()) gameOver = true; // End the game if new piece collides
+  }
+}
+
+// Check if the current piece collides with the board
+function checkCollision() {
+  for (let row = 0; row < currentPiece.shape.length; row++) {
+    for (let col = 0; col < currentPiece.shape[row].length; col++) {
+      if (currentPiece.shape[row][col]) {
+        const newX = currentPiece.x + col;
+        const newY = currentPiece.y + row;
+        if (newX < 0 || newX >= COLS || newY >= ROWS || board[newY][newX]) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Place the current piece onto the board
+function placePiece() {
+  currentPiece.shape.forEach((row, rIdx) => {
+    row.forEach((cell, cIdx) => {
+      if (cell) {
+        board[currentPiece.y + rIdx][currentPiece.x + cIdx] = currentPiece.color;
+      }
+    });
+  });
+}
+
+// Clear completed lines and update the score
+function clearLines() {
+  let linesCleared = 0;  // Track the number of lines cleared
+  for (let row = ROWS - 1; row >= 0; row--) {
+    if (board[row].every(cell => cell)) {  // If the row is completely filled
+      board.splice(row, 1);  // Remove the filled row
+      board.unshift(Array(COLS).fill(null));  // Add an empty row at the top
+      score += SCORE_WORTH;
+      linesCleared++;  // Increment linesCleared count
+      row++;  // Stay on the same row index after clearing to recheck for consecutive filled rows
+    }
+  }
+
+  // Trigger confetti effect and "Tetris!" message when 4 lines are cleared
+  if (linesCleared === 4) {
+    launchConfetti();  // Launch the confetti animation
+    showTetrisMessage();  // Show the Tetris message on the screen
+    score += 800;  // Increase score by 800 after clearing 4 lines
+    drawScore();  // Update score display
+  }
+}
+
+// Function to display the Tetris message on the canvas
+function showTetrisMessage() {
+  if (!tetrisMessageShown) {
+    tetrisMessageStartTime = Date.now();
+    tetrisMessageShown = true;
+  }
+}
+
+// Update high score in localStorage
+function updateHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('highScore', highScore);
+  }
+}
+
+// Draw the score and high score in HTML (removing in-canvas display)
+function drawScore() {
+  document.getElementById("score").innerText = "Score: " + score;
+  document.getElementById("high-score").innerText = "High Score: " + highScore;
+}
+
+// Game loop function
+function gameLoop() {
+  if (gameOver) {
+    clearInterval(gameInterval);
+    updateHighScore();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '30px Arial';
+    ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
+    return;
+  }
+
+  movePieceDown();
+  drawBoard();
+  drawPiece();
+  drawScore();
+  updateConfetti();  // Update and draw confetti
+
+  // Show the Tetris message for a short period (1 second)
+  if (tetrisMessageShown && Date.now() - tetrisMessageStartTime < 1000) {
+    ctx.fillStyle = 'gold';
+    ctx.font = '40px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Tetris! +800', canvas.width / 2, canvas.height / 2);
+  }
+}
+
+// Initialize the game
+function startGame() {
+  clearInterval(gameInterval);  // Clear any existing intervals to avoid speeding up
+  board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  currentPiece = generatePiece();
+  score = 0;
+  gameOver = false;
+  confettiArray = [];  // Reset confetti
+  confettiSpawnTime = Date.now();  // Start tracking confetti spawn time
+  tetrisMessageShown = false;  // Reset Tetris message
+  gameInterval = setInterval(gameLoop, GAME_CLOCK);  // Restart the game loop
+}
+
+// Event listeners for movement (WASD keys)
+document.addEventListener("keydown", (event) => {
+  if (gameOver) return; // Prevent key actions if the game is over
+
+  switch (event.key) {
+    case "a":  // Move left
+      currentPiece.x--;
+      if (checkCollision()) currentPiece.x++;
+      break;
+    case "d":  // Move right
+      currentPiece.x++;
+      if (checkCollision()) currentPiece.x--;
+      break;
+    case "s":  // Move down
+      movePieceDown();
+      break;
+    case "w":  // Rotate clockwise
+      rotatePiece();
+      if (checkCollision()) rotatePiece(true);  // Undo if collision occurs
+      break;
+  }
+  drawBoard();
+  drawPiece();
+});
+
+// Rotate the piece clockwise
+function rotatePiece() {
+  const originalShape = currentPiece.shape;
+  currentPiece.shape = currentPiece.shape[0].map((_, idx) =>
+    currentPiece.shape.map(row => row[idx]).reverse()
+  );
+  if (checkCollision()) currentPiece.shape = originalShape;  // Revert if collision occurs
+}
+
+// Trigger the start of the game
+startGame();
+
+// Function to launch the confetti
+// Function to launch the confetti
+function launchConfetti() {
+  // Set spawn time for 1 second
+  confettiSpawnTime = Date.now();
+
+    const confettiCount = 75;  // Increase to 75 confetti pieces
+  for (let i = 0; i < confettiCount; i++) {
+    const width = Math.random() * 8 + 5;  // Smaller width for each piece
+    const height = Math.random() * 8 + 5;  // Smaller height for each piece
+    const confettiPiece = {
+    x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
+    y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
+    width: width,
+    height: height,
+    color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
+    speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
+    speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
+    startTime: Date.now() // Time when confetti started
+    };
+    confettiArray.push(confettiPiece);
+  }
+}
+
+// Update and draw confetti
+function updateConfetti() {
+  const now = Date.now();
+
+  // Remove confetti after 2 seconds
+  confettiArray = confettiArray.filter(piece => now - piece.startTime < 2000);  // Keep for 2 seconds
+
+  // Update each piece's position and remove if out of screen
+  for (let i = 0; i < confettiArray.length; i++) {
+    const piece = confettiArray[i];
+    piece.y += piece.speedY;  // Make them fall at a faster speed
+    piece.x += piece.speedX;  // Random horizontal movement
+
+    // Draw each confetti piece
+    ctx.fillStyle = piece.color;
+    ctx.fillRect(piece.x, piece.y, piece.width, piece.height);
+  }
+}

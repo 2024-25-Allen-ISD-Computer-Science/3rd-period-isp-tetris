@@ -3,9 +3,9 @@ class GameModel {
         this.ctx = ctx;
         this.fallingPiece = null;
         this.grid = this.makeStartingGrid();
+        this.gameOver = false; // Add game over flag
     }
- 
- 
+
     makeStartingGrid() {
         let grid = [];
         for (var i = 0; i < ROWS; i++) {
@@ -16,8 +16,7 @@ class GameModel {
         }
         return grid;
     }
- 
- 
+
     collision(x, y) {
         const shape = this.fallingPiece.shape;
         const n = shape.length;
@@ -38,8 +37,7 @@ class GameModel {
         }
         return false;
     }
- 
- 
+
     renderGameState() {
         this.ctx.clearRect(0, 0, COLS, ROWS); // Clear the canvas before rendering
         for (let i = 0; i < this.grid.length; i++) {
@@ -51,18 +49,16 @@ class GameModel {
                 }
             }
         }
- 
- 
+
         if (this.fallingPiece !== null) {
             this.fallingPiece.renderPiece();
         }
     }
- 
- 
+
     moveDown() {
-        if (this.fallingPiece === null) {
+        if (this.fallingPiece === null || this.gameOver) {
             this.renderGameState();
-            return;
+            return; // No more movement if game is over
         } else if (this.collision(this.fallingPiece.x, this.fallingPiece.y + 1)) {
             const shape = this.fallingPiece.shape;
             const x = this.fallingPiece.x;
@@ -76,12 +72,12 @@ class GameModel {
                     }
                 });
             });
- 
- 
+
             // check game over
             if (this.fallingPiece.y === 0) {
+                this.gameOver = true; // Set game over flag
                 alert("Game over!");
-                this.grid = this.makeStartingGrid();
+                return; // Stop the game immediately when game over
             }
             this.fallingPiece = null;
         } else {
@@ -89,33 +85,30 @@ class GameModel {
         }
         this.renderGameState();
     }
- 
- 
+
     move(right) {
-        if (this.fallingPiece === null) {
-            return;
+        if (this.fallingPiece === null || this.gameOver) {
+            return; // No more movement if game is over
         }
- 
- 
+
         let x = this.fallingPiece.x;
         let y = this.fallingPiece.y;
         if (right) {
             // move right
             if (!this.collision(x + 1, y)) {
-                this.fallingPiece.x += 1; // Corrected to increment x
+                this.fallingPiece.x += 1;
             }
         } else {
             // move left
             if (!this.collision(x - 1, y)) {
-                this.fallingPiece.x -= 1; // Corrected to decrement x
+                this.fallingPiece.x -= 1;
             }
         }
         this.renderGameState();
     }
- 
- 
+
     rotate() {
-        if (this.fallingPiece !== null) {
+        if (this.fallingPiece !== null && !this.gameOver) {
             let shape = this.fallingPiece.shape;
             for (let y = 0; y < shape.length; ++y) {
                 for (let x = 0; x < y; ++x) {
@@ -128,5 +121,11 @@ class GameModel {
         }
         this.renderGameState();
     }
- } 
- 
+
+    resetGame() {
+        this.grid = this.makeStartingGrid();
+        this.fallingPiece = null;
+        this.gameOver = false; // Reset game over flag
+    }
+}
+
