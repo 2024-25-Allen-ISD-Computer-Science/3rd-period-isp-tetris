@@ -46,6 +46,7 @@ const SHAPES = [
         [0, 7, 7],
         [0, 0, 0],
     ],
+    
 ];
 
 const COLORS = [
@@ -57,4 +58,5 @@ const COLORS = [
     '#A80BE7', // shape 6
     '#F879A0'  // shape 7
 ];
+
 
