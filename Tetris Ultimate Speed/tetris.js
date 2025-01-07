@@ -13,6 +13,7 @@ resetButton.addEventListener("click", () => {
   startGame();  
 });
 
+
 // Confetti array to store the falling squares
 let confettiArray = [];
 let confettiSpawnTime = 0;  // Time when confetti should stop spawning
@@ -33,10 +34,14 @@ function drawBoard() {
   }
 }
 
-// Draw the current piece on the board
+
 function drawPiece() {
   if (!currentPiece) return;
 
+  // Draw the shadow first (gray and translucent)
+  drawShadowPiece();
+
+  // Draw the actual piece
   currentPiece.shape.forEach((row, rIdx) => {
     row.forEach((cell, cIdx) => {
       if (cell) {
@@ -46,6 +51,44 @@ function drawPiece() {
     });
   });
 }
+
+function drawShadowPiece() {
+  if (!currentPiece) return;
+
+  // Copy the current piece to simulate the shadow piece
+  const shadowPiece = { ...currentPiece, y: currentPiece.y };  // Start from the current position
+  
+  // Move the shadow piece down until it collides with the board
+  while (!checkCollisionAt(shadowPiece)) {
+    shadowPiece.y++; // Keep moving down until collision
+  }
+
+  shadowPiece.y--;  // Step back to the last valid position
+
+  // Draw the shadow piece
+  shadowPiece.shape.forEach((row, rIdx) => {
+    row.forEach((cell, cIdx) => {
+      if (cell) {
+        ctx.fillStyle = 'rgba(169, 169, 169, 0.5)';  // Gray with transparency for the shadow
+        ctx.fillRect((shadowPiece.x + cIdx) * BLOCK_SIDE_LENGTH, (shadowPiece.y + rIdx) * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+      }
+    });
+  });
+}
+
+function checkCollisionAt(piece) {
+  for (let row = 0; row < piece.shape.length; row++) {
+    for (let col = 0; col < piece.shape[row].length; col++) {
+      if (piece.shape[row][col]) {
+        const newX = piece.x + col;
+        const newY = piece.y + row;
+        if (newX < 0 || newX >= COLS || newY >= ROWS || board[newY][newX]) return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 // Generate a new piece
 function generatePiece() {
@@ -58,7 +101,7 @@ function generatePiece() {
   };
 }
 
-// Handle movement of the piece down
+// moves piece down
 function movePieceDown() {
   if (gameOver) return;  // Prevent moving if the game is over
   currentPiece.y++;
@@ -69,6 +112,23 @@ function movePieceDown() {
     currentPiece = generatePiece();
     if (checkCollision()) gameOver = true; // End the game if new piece collides
   }
+}
+
+// drops piece to ground
+function dropPieceDown() {
+  if (gameOver) return; // Prevent moving if the game is over
+
+  // Teleport the piece to the lowest valid position
+  while (!checkCollision()) {
+      currentPiece.y++; // Move the piece down until it collides
+  }
+  currentPiece.y--; // Step back to the last valid position
+
+  // Place the piece and handle game state
+  placePiece();
+  clearLines();
+  currentPiece = generatePiece();
+  if (checkCollision()) gameOver = true; // End the game if new piece collides
 }
 
 // Check if the current piece collides with the board
@@ -134,7 +194,7 @@ function updateHighScore() {
   }
 }
 
-// Draw the score and high score in HTML (removing in-canvas display)
+// Draw the score and high score in HTML 
 function drawScore() {
   document.getElementById("score").innerText = "Score: " + score;
   document.getElementById("high-score").innerText = "High Score: " + highScore;
@@ -195,7 +255,7 @@ document.addEventListener("keydown", (event) => {
       if (checkCollision()) currentPiece.x--;
       break;
     case "s":  // Move down
-      movePieceDown();
+      dropPieceDown();
       break;
     case "w":  // Rotate clockwise
       rotatePiece();
@@ -218,7 +278,6 @@ function rotatePiece() {
 // Trigger the start of the game
 startGame();
 
-// Function to launch the confetti
 // Function to launch the confetti
 function launchConfetti() {
   // Set spawn time for 1 second
@@ -260,3 +319,8 @@ function updateConfetti() {
     ctx.fillRect(piece.x, piece.y, piece.width, piece.height);
   }
 }
+
+
+
+
+

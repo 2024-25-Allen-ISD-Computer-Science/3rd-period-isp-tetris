@@ -1,0 +1,140 @@
+/* Basic body styling */
+body {
+    background-color: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+/* Main container to center the game and button container horizontally */
+#main-container {
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    align-items: center; /* Align items to the top */
+    justify-content: center; /* Align everything to the left */
+    width: 100%; /* Full width of the page */
+}
+
+/* Game layout settings */
+#game-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 45px;
+}
+
+/* Canvas styling */
+#game-canvas {
+    border: 5px solid white;
+    background-color: black;
+}
+
+h1 {
+    font-size: 50px;
+    margin-bottom: 20px;
+    position: absolute; /* Or use fixed */
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%; 
+    margin: 0;
+    text-align: center;
+    z-index: 10; /* Ensure it's above other content */
+}
+
+.score-box {
+    font-size: 18px;
+    color: white;
+    font-weight: bold;
+    text-align: center; /* Centers the score container */
+    display: inline-block;
+    width: 150px;
+    padding: 7px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+/* Original button size */
+.button {
+    font-weight: bold;
+    padding: 10px 20px;
+    background-color: gray;
+    border: none; /* Removed border */
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    transition: 0.4s;
+    width: auto; /* Let the buttons have their original size */
+}
+
+.button:hover {
+    background-color: #000000;
+    color: white;
+}
+
+/* Dropdown menu styling */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content{
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 100%; 
+    max-width: 175px; 
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+  
+/* Reset button styling */
+#reset-button {
+    font-weight: bold;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none; /* Removed border */
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+    margin-top: 5px;
+    width: auto; /* uses original width */
+}
+
+#reset-button:hover {
+    background-color: #042f5e;
+}
+
+.space {
+    opacity: 0;
+}
+
+
