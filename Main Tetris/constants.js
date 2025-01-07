@@ -1,8 +1,15 @@
-const GAME_CLOCK = 1000;
+const GAME_CLOCK = 800;
 const BLOCK_SIDE_LENGTH = 30;
 const ROWS = 20;
 const COLS = 10;
 const SCORE_WORTH = 100;
+
+const tetrisContainer = document.getElementById("game-container");
+const buttonContainer = document.getElementById("button-container")
+const switchModeButton = document.getElementById("switch-mode-button");
+const modeButton = document.getElementById('toggle-mode');
+const themeButton = document.getElementById('theme-button');
+
 
 const SHAPES = [
     [
@@ -46,6 +53,7 @@ const SHAPES = [
         [0, 7, 7],
         [0, 0, 0],
     ],
+    
 ];
 
 const COLORS = [
@@ -58,3 +66,5 @@ const COLORS = [
     '#F879A0'  // shape 7
 ];
 
+
+//jhgjgf
