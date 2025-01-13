@@ -49,7 +49,7 @@ body {
 }
 
 h1 {
-    font-size: 50px;
+    font-size: 55px;
     margin-bottom: 20px;
     position: absolute; /* Or use fixed */
     top: 0px;
@@ -88,7 +88,8 @@ h1 {
     color: white;
     cursor: pointer;
     transition: 0.4s;
-    width: auto; /* Let the buttons have their original size */
+    width: 200px; /* Let the buttons have their original size */
+    height: auto;
 }
 
 .button:hover {
@@ -158,9 +159,9 @@ h1 {
     margin-top: 20px;
 }
 
-/* Optional: Add hover effect */
+/* Slightly darker background on hover */
 .dropdown .dropdown-content button#double-speed:hover {
-    background-color: #ddd; /* Slightly darker background on hover */
+    background-color: #ddd; 
 }
 
 .dropdown .dropdown-content button#normal-speed  {
@@ -171,7 +172,7 @@ h1 {
     cursor: pointer;
 }
 
-/* Optional: Add hover effect */
+/* Slightly darker background on hover */
 .dropdown .dropdown-content button#normal-speed:hover {
-    background-color: #ddd; /* Slightly darker background on hover */
+    background-color: #ddd; 
 }

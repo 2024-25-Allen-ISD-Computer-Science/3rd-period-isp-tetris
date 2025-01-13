@@ -10,7 +10,6 @@ const switchModeButton = document.getElementById("switch-mode-button");
 const modeButton = document.getElementById('toggle-mode');
 const themeButton = document.getElementById('theme-button');
 
-
 const SHAPES = [
     [
         [0, 0, 0, 0],

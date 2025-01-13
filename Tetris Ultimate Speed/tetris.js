@@ -13,7 +13,6 @@ resetButton.addEventListener("click", () => {
   startGame();  
 });
 
-
 // Confetti array to store the falling squares
 let confettiArray = [];
 let confettiSpawnTime = 0;  // Time when confetti should stop spawning
@@ -33,7 +32,6 @@ function drawBoard() {
     }
   }
 }
-
 
 function drawPiece() {
   if (!currentPiece) return;
