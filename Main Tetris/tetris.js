@@ -13,7 +13,6 @@ resetButton.addEventListener("click", () => {
   startGame();  
 });
 
-
 // Confetti array to store the falling squares
 let confettiArray = [];
 let confettiSpawnTime = 0;  // Time when confetti should stop spawning
@@ -23,6 +22,10 @@ let tetrisMessageStartTime = 0;  // Time when Tetris message should disappear
 // Draw the game board
 function drawBoard() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);  
+  
+  // Draw the grid
+  drawGrid();
+  
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
       const color = board[row][col];
@@ -34,6 +37,26 @@ function drawBoard() {
   }
 }
 
+// Draw the grid lines
+function drawGrid() {
+  ctx.beginPath();
+  ctx.strokeStyle = '#ddd'; // Light gray color for the grid lines
+  ctx.lineWidth = 1;
+
+  // Draw vertical lines
+  for (let col = 0; col <= COLS; col++) {
+    ctx.moveTo(col * BLOCK_SIDE_LENGTH, 0);
+    ctx.lineTo(col * BLOCK_SIDE_LENGTH, canvas.height);
+  }
+
+  // Draw horizontal lines
+  for (let row = 0; row <= ROWS; row++) {
+    ctx.moveTo(0, row * BLOCK_SIDE_LENGTH);
+    ctx.lineTo(canvas.width, row * BLOCK_SIDE_LENGTH);
+  }
+
+  ctx.stroke();
+}
 
 function drawPiece() {
   if (!currentPiece) return;
@@ -89,7 +112,6 @@ function checkCollisionAt(piece) {
   return false;
 }
 
-
 // Generate a new piece
 function generatePiece() {
   const idx = Math.floor(Math.random() * SHAPES.length);
@@ -130,9 +152,6 @@ function dropPieceDown() {
   currentPiece = generatePiece();
   if (checkCollision()) gameOver = true; // End the game if new piece collides
 }
-
-
-
 
 // Check if the current piece collides with the board
 function checkCollision() {
@@ -286,19 +305,19 @@ function launchConfetti() {
   // Set spawn time for 1 second
   confettiSpawnTime = Date.now();
 
-    const confettiCount = 75;  // Increase to 75 confetti pieces
+  const confettiCount = 75;  // Increase to 75 confetti pieces
   for (let i = 0; i < confettiCount; i++) {
     const width = Math.random() * 8 + 5;  // Smaller width for each piece
     const height = Math.random() * 8 + 5;  // Smaller height for each piece
     const confettiPiece = {
-    x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
-    y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
-    width: width,
-    height: height,
-    color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
-    speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
-    speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
-    startTime: Date.now() // Time when confetti started
+      x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
+      y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
+      width: width,
+      height: height,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
+      speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
+      speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
+      startTime: Date.now() // Time when confetti started
     };
     confettiArray.push(confettiPiece);
   }
@@ -322,6 +341,3 @@ function updateConfetti() {
     ctx.fillRect(piece.x, piece.y, piece.width, piece.height);
   }
 }
-
-
-
