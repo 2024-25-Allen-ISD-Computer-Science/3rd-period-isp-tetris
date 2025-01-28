@@ -88,6 +88,7 @@ function renderBoard() {
         cell.classList.add('filled');
         cell.style.backgroundColor = board[r][c];
       }
+      
 
       // Mouse hover for placement preview
       cell.addEventListener('mouseover', () => {

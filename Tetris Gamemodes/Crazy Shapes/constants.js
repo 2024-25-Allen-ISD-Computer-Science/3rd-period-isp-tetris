@@ -64,3 +64,4 @@ const COLORS = [
     '#A80BE7', // shape 6
     '#F879A0'  // shape 7
 ];
+
