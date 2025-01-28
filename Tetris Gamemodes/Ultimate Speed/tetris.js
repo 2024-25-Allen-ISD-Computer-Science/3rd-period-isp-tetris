@@ -22,10 +22,6 @@ let tetrisMessageStartTime = 0;  // Time when Tetris message should disappear
 // Draw the game board
 function drawBoard() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);  
-  
-  // Draw the grid
-  drawGrid();
-  
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
       const color = board[row][col];
@@ -35,27 +31,6 @@ function drawBoard() {
       }
     }
   }
-}
-
-// Draw the grid lines
-function drawGrid() {
-  ctx.beginPath();
-  ctx.strokeStyle = '#ddd'; // Light gray color for the grid lines
-  ctx.lineWidth = 1;
-
-  // Draw vertical lines
-  for (let col = 0; col <= COLS; col++) {
-    ctx.moveTo(col * BLOCK_SIDE_LENGTH, 0);
-    ctx.lineTo(col * BLOCK_SIDE_LENGTH, canvas.height);
-  }
-
-  // Draw horizontal lines
-  for (let row = 0; row <= ROWS; row++) {
-    ctx.moveTo(0, row * BLOCK_SIDE_LENGTH);
-    ctx.lineTo(canvas.width, row * BLOCK_SIDE_LENGTH);
-  }
-
-  ctx.stroke();
 }
 
 function drawPiece() {
@@ -111,6 +86,7 @@ function checkCollisionAt(piece) {
   }
   return false;
 }
+
 
 // Generate a new piece
 function generatePiece() {
@@ -305,19 +281,19 @@ function launchConfetti() {
   // Set spawn time for 1 second
   confettiSpawnTime = Date.now();
 
-  const confettiCount = 75;  // Increase to 75 confetti pieces
+    const confettiCount = 75;  // Increase to 75 confetti pieces
   for (let i = 0; i < confettiCount; i++) {
     const width = Math.random() * 8 + 5;  // Smaller width for each piece
     const height = Math.random() * 8 + 5;  // Smaller height for each piece
     const confettiPiece = {
-      x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
-      y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
-      width: width,
-      height: height,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
-      speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
-      speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
-      startTime: Date.now() // Time when confetti started
+    x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
+    y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
+    width: width,
+    height: height,
+    color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
+    speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
+    speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
+    startTime: Date.now() // Time when confetti started
     };
     confettiArray.push(confettiPiece);
   }
@@ -352,7 +328,16 @@ class GameModel {
       this.gameOver = false; // Add game over flag
   }
 
-
+  makeStartingGrid() {
+      let grid = [];
+      for (var i = 0; i < ROWS; i++) {
+          grid.push([]);
+          for (var j = 0; j < COLS; j++) {
+              grid[grid.length - 1].push(0);
+          }
+      }
+      return grid;
+  }
 
   collision(x, y) {
       const shape = this.fallingPiece.shape;
@@ -392,7 +377,36 @@ class GameModel {
       }
   }
 
+  moveDown() {
+      if (this.fallingPiece === null || this.gameOver) {
+          this.renderGameState();
+          return; // No more movement if game is over
+      } else if (this.collision(this.fallingPiece.x, this.fallingPiece.y + 1)) {
+          const shape = this.fallingPiece.shape;
+          const x = this.fallingPiece.x;
+          const y = this.fallingPiece.y;
+          shape.map((row, i) => {
+              row.map((cell, j) => {
+                  let p = x + j;
+                  let q = y + i;
+                  if (p >= 0 && p < COLS && q < ROWS && cell > 0) {
+                      this.grid[q][p] = shape[i][j];
+                  }
+              });
+          });
 
+          // check game over
+          if (this.fallingPiece.y === 0) {
+              this.gameOver = true; // Set game over flag
+              alert("Game over!");
+              return; // Stop the game immediately when game over
+          }
+          this.fallingPiece = null;
+      } else {
+          this.fallingPiece.y += 1;
+      }
+      this.renderGameState();
+  }
 
   move(right) {
       if (this.fallingPiece === null || this.gameOver) {
@@ -437,14 +451,13 @@ class GameModel {
   }
 }
 
-//Block Blast game mode button logic
+//Back to normal tetris game mode button
 document.getElementById("switch-mode-button").addEventListener("click", function() {
-  window.location.href = "http://127.0.0.1:5500/Block%20Blast/index.html"; 
+  window.location.href = "http://127.0.0.1:5500/Main%20Tetris/index.html"; 
 });
 
 
-
-//piece.js
+//Piece
 class Piece {
   constructor(shape, ctx, initialX = Math.floor(COLS / 2), initialY = -2) {
       this.shape = shape;

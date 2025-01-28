@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Block Blast</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>
+    <!-- Your fancy color letters here -->
+    <span class="tetris-letter" style="color: #ff3b30;">B</span>
+    <span class="tetris-letter" style="color: #ffcc00;">L</span>
+    <span class="tetris-letter" style="color: #4cd137;">O</span>
+    <span class="tetris-letter" style="color: #2980b9;">C</span>
+    <span class="tetris-letter" style="color: #8e44ad;">K</span>
+    <span class="space" style="color: #000000;">X</span>
+    <span class="tetris-letter" style="color: #f39c12;">B</span>
+    <span class="tetris-letter" style="color: #ff3b30;">L</span>
+    <span class="tetris-letter" style="color: #ffcc00;">A</span>
+    <span class="tetris-letter" style="color: #4cd137;">S</span>
+    <span class="tetris-letter" style="color: #2980b9;">T</span>
+  </h1>
+  
+  <button id="switch-mode-button" class="button">Back to Tetris</button>
+
+  <!-- Score container at the top -->
+  <div class="score-container">
+    <div class="score-box" id="score">Score: 0</div>
+    <div class="score-box" id="high-score">High Score: 0</div>
+  </div>
+
+  <div id="game-container">
+    <div id="board"></div>
+    <div id="shapes-panel"></div>
+  </div>
+
+  <div id="info">
+    <!-- Removed the duplicate scoreboard line here -->
+    <p id="status"></p>
+  </div>
+
+  <button id="reset-button">Reset Game</button>
+
+  <script src="script.js"></script>
+</body>
+</html>

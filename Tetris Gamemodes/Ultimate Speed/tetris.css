@@ -10,28 +10,13 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#full-game{
-    align-content: center;
-    padding-right: 205px;
-}
-
 /* Main container to center the game and button container horizontally */
 #main-container {
     display: flex;
     flex-direction: row; /* Arrange items horizontally */
-    align-items: flex-start; /* Align items to the top */
+    align-items: center; /* Align items to the top */
+    justify-content: center; /* Align everything to the left */
     width: 100%; /* Full width of the page */
-}
-
-/* Button container with stacked buttons */
-#button-container {
-    margin-top: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;  /* Button spacing */
-    margin-right: 10px; /* Game Spacing */
-    
 }
 
 /* Game layout settings */
@@ -40,6 +25,7 @@ body {
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 45px;
 }
 
 /* Canvas styling */
@@ -88,8 +74,7 @@ h1 {
     color: white;
     cursor: pointer;
     transition: 0.4s;
-    width: 200px; /* Let the buttons have their original size */
-    height: auto;
+    width: auto; /* Let the buttons have their original size */
 }
 
 .button:hover {
@@ -104,7 +89,6 @@ h1 {
 }
 
 .dropdown-content{
-    text-align: center;
     display: none;
     position: absolute;
     right: 0;
@@ -142,7 +126,6 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s;
     margin-top: 5px;
-    margin-bottom: 7px;
     width: auto; /* uses original width */
 }
 
@@ -150,47 +133,8 @@ h1 {
     background-color: #042f5e;
 }
 
-.dropdown .dropdown-content button#double-speed  {
-    background-color: #f0f0f0; /* Light background */
-    color: #333; /* Dark text */
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    margin-top: 20px;
+.space {
+    opacity: 0;
 }
 
-/* Slightly darker background on hover */
-.dropdown .dropdown-content button#double-speed:hover {
-    background-color: #ddd; 
-}
 
-.dropdown .dropdown-content button#normal-speed  {
-    background-color: #f0f0f0; /* Light background */
-    color: #333; /* Dark text */
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
-
-/* Slightly darker background on hover */
-.dropdown .dropdown-content button#normal-speed:hover {
-    background-color: #ddd; 
-}
-
-#music-control-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    background-color: #4cd137;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-#music-control-button:hover {
-    background-color: #44bd32;
-}

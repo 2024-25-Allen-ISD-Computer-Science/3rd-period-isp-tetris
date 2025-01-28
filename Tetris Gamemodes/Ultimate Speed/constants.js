@@ -1,4 +1,4 @@
-const GAME_CLOCK = 150;
+const GAME_CLOCK = 100;
 const BLOCK_SIDE_LENGTH = 30;
 const ROWS = 20;
 const COLS = 10;

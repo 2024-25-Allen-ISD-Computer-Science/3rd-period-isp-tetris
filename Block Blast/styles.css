@@ -1,0 +1,157 @@
+/* ===== Body & Basic Layout ===== */
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  background-color: gray;
+}
+
+h1 {
+    font-size: 55px;
+    position: absolute; /* Or use fixed */
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%; 
+    margin: 0;
+    text-align: center;
+    z-index: 10; /* Ensure it's above other content */
+}
+
+.space {
+  opacity: 0;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;  /* board on top, shapes panel below */
+  align-items: center;     /* center all children horizontally */
+  gap: 1rem;
+}
+
+/* ===== Board Styles ===== */
+#board {
+  display: grid;
+  grid-template-columns: repeat(10, 40px); /* Increased from 30px */
+  grid-template-rows: repeat(10, 40px);    /* Increased from 30px */
+  gap: 3px; /* Slightly larger gap to maintain spacing */
+  background: #555;
+  padding: 6px; /* Increased padding slightly */
+}
+
+.cell {
+  width: 40px; /* Increased from 30px */
+  height: 40px; /* Increased from 30px */
+  background: #ccc;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+/* Filled cells on the board */
+.filled {
+  background: #4e8ef7; /* Filled block color */
+}
+
+/* Hover preview styles */
+.hover-valid {
+  background: rgba(0, 255, 0, 0.4) !important; /* Light green overlay */
+}
+.hover-invalid {
+  background: rgba(255, 0, 0, 0.4) !important; /* Light red overlay */
+}
+
+/* ===== Shapes Panel ===== */
+#shapes-panel {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  justify-content: center; /* center the shapes horizontally in the panel */
+}
+
+/* Container for each shape’s bounding box */
+.shape-container {
+  display: grid;
+  background: none;
+  padding: 6px; /* Slightly larger padding */
+  cursor: pointer;
+  border: 1px solid transparent;
+  grid-gap: 8px; /* Increased gap between mini-grid cells */
+}
+
+/* The squares that make up the shape */
+.shape-block {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.2s; /* smooth scaling over 0.2s */
+}
+
+.shape-container.selected .shape-block {
+  transform: scale(1.2);       /* blocks grow ~10% larger */
+  transform-origin: center;    /* keep them centered while scaling */
+}
+
+/* Empty cells in the shape's bounding box—transparent so the shape stands out */
+.shape-empty {
+  width: 40px; /* Increased from 30px */
+  height: 40px; /* Increased from 30px */
+  background: none;
+}
+
+/* ===== Info Area ===== */
+#info {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.button {
+  margin-top: 125px;
+  font-weight: bold;
+  padding: 10px 20px;
+  background-color: gray;
+  border: none; /* Removed border */
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  transition: 0.4s;
+  width: auto; /* Let the buttons have their original size */
+}
+
+.button:hover {
+  background-color: #000000;
+  color: white;
+}
+
+.score-box {
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+  text-align: center; /* Centers the score container */
+  display: inline-block;
+  width: 150px;
+  padding: 7px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  background-color: #333;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+#reset-button {
+  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none; /* Removed border */
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s;
+  margin-top: 5px;
+  width: auto; /* uses original width */
+}

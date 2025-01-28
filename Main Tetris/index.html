@@ -8,24 +8,6 @@
        <link rel="stylesheet" href="tetris.css">
        <title>Tetris Game</title>
        <style>
-           /* Styling for the Pause/Play Button */
-           #music-control-button {
-               position: fixed;
-               bottom: 20px;
-               right: 20px;
-               padding: 10px 20px;
-               background-color: #4cd137;
-               color: white;
-               border: none;
-               border-radius: 5px;
-               cursor: pointer;
-               font-size: 16px;
-               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-           }
-
-           #music-control-button:hover {
-               background-color: #44bd32;
-           }
        </style>
    </head>
    <body>
@@ -87,24 +69,6 @@
        <script src="./gamemodel.js"></script>
        <script src="./tetris.js"></script>
 
-       <script>
-           // Background music and control button logic
-           const music = document.getElementById('background-music');
-           const musicControlButton = document.getElementById('music-control-button');
-
-           // Set initial volume
-           music.volume = 0.5;
-
-           // Toggle music play/pause
-           musicControlButton.addEventListener('click', () => {
-               if (music.paused) {
-                   music.play();
-                   musicControlButton.textContent = 'Pause Music';
-               } else {
-                   music.pause();
-                   musicControlButton.textContent = 'Play Music';
-               }
-           });
-       </script>
+       
    </body>
 </html>
