@@ -1,6 +1,4 @@
-/******************************************************************************
- * 1) GLOBAL GAME STATE
- ******************************************************************************/
+// Global game state
 
 const boardSize = 10;
 let board = [];
@@ -9,9 +7,7 @@ let highScore = 0;
 let shapesInPlay = [];
 let selectedShape = null;
 
-/******************************************************************************
- * 2) SHAPES ARRAY WITH MULTIPLE SHAPES & ORIENTATIONS
- ******************************************************************************/
+// Shape arrat with 4 different orientations
 const SHAPES = [
   // L-shape, color = "red"
   ['#ff3b30',   [[0,0],[1,0],[2,0],[2,1],[2,2]] ],
@@ -55,11 +51,7 @@ const SHAPES = [
   ['#2980b9', [[0,0],[1,0],[2,0],[2,1]] ],
   ['#2980b9', [[0,0],[0,1],[0,2],[1,0]] ],
 ];
-
-/******************************************************************************
- * 3) INITIALIZE THE BOARD
- * We'll store 0 for empty, or a color string if filled.
- ******************************************************************************/
+// Initialize the board
 function initBoard() {
   board = [];
   for (let r = 0; r < boardSize; r++) {
@@ -71,9 +63,7 @@ function initBoard() {
   }
 }
 
-/******************************************************************************
- * 4) RENDER THE BOARD
- ******************************************************************************/
+// Render the board
 function renderBoard() {
   const boardDiv = document.getElementById('board');
   boardDiv.innerHTML = '';
@@ -114,9 +104,7 @@ function renderBoard() {
   }
 }
 
-/******************************************************************************
- * 5) GENERATE SHAPES (pick 3 random shapes)
- ******************************************************************************/
+// Generate shapes (3 random)
 function generateShapes() {
   shapesInPlay = [];
   for (let i = 0; i < 3; i++) {
@@ -128,9 +116,7 @@ function generateShapes() {
   }
 }
 
-/******************************************************************************
- * 6) RENDER THE SHAPES PANEL
- ******************************************************************************/
+// Render shapes pannel
 function renderShapesPanel() {
   const panel = document.getElementById('shapes-panel');
   panel.innerHTML = '';
@@ -189,9 +175,7 @@ function renderShapesPanel() {
   });
 }
 
-/******************************************************************************
- * 7) CHECK IF SHAPE CAN BE PLACED
- ******************************************************************************/
+// Check if shape can be placed
 function canPlaceShape(board, row, col, shape) {
   const coords = shape[1];
   for (const [x, y] of coords) {
@@ -216,9 +200,7 @@ function canPlaceShape(board, row, col, shape) {
   return true;
 }
 
-/******************************************************************************
- * 8) HOVER HIGHLIGHT FOR POTENTIAL PLACEMENT
- ******************************************************************************/
+// Hover hilight for potential placement
 function highlightPlacement(row, col, shape, highlight) {
   const boardDiv = document.getElementById('board');
   const cells = boardDiv.children;
@@ -254,11 +236,7 @@ function highlightPlacement(row, col, shape, highlight) {
   });
 }
 
-/******************************************************************************
- * 9) PLACE SHAPE IF VALID
- *
- * +10 for placing a shape, +100 per cleared line.
- ******************************************************************************/
+// Place shape if valid
 function placeShapeIfValid(row, col, shape) {
   const [color, coords] = shape;
 
@@ -291,7 +269,7 @@ function placeShapeIfValid(row, col, shape) {
   // Deselect
   selectedShape = null;
 
-  // If we ran out of shapes, generate a new set
+  // If out of shapes, generate a new set
   if (shapesInPlay.length === 0) {
     generateShapes();
     renderShapesPanel();
@@ -306,17 +284,12 @@ function placeShapeIfValid(row, col, shape) {
   }
 }
 
-/******************************************************************************
- * 10) REMOVE SHAPE FROM SHAPESINPLAY
- ******************************************************************************/
+// Remove shape from spawn
 function removeShapeFromPlay(shape) {
   shapesInPlay = shapesInPlay.filter(s => s !== shape);
 }
 
-/******************************************************************************
- * 11) CLEAR FULL ROWS & COLUMNS
- * Each line cleared => +100
- ******************************************************************************/
+// Clear full rows and colums
 function clearFullLines() {
   let linesCleared = 0;
 
@@ -352,9 +325,7 @@ function clearFullLines() {
   }
 }
 
-/******************************************************************************
- * 12) CHECK IF ANY VALID MOVE EXISTS => GAME OVER?
- ******************************************************************************/
+// Check if anhy valid moves exist
 function isGameOver() {
   if (shapesInPlay.length === 0) return false; // no shapes => not game over
 
@@ -370,9 +341,7 @@ function isGameOver() {
   return true; // no valid moves => game over
 }
 
-/******************************************************************************
- * 13) INIT / START THE GAME
- ******************************************************************************/
+// Start game
 function initGame() {
   // Load high score from localStorage if present
   const savedHighScore = localStorage.getItem('blockBlastHighScore');
@@ -393,9 +362,7 @@ function initGame() {
   document.getElementById('status').innerText = '';
 }
 
-/******************************************************************************
- * 14) UPDATE HIGH SCORE
- ******************************************************************************/
+// Update highscore
 function updateHighScore() {
   if (score > highScore) {
     highScore = score;
@@ -404,9 +371,7 @@ function updateHighScore() {
   }
 }
 
-/******************************************************************************
- * 15) RESET THE GAME
- ******************************************************************************/
+// Reset the game
 function resetGame() {
   score = 0;
   document.getElementById('score').textContent = 'Score: ' + score;
@@ -418,9 +383,6 @@ function resetGame() {
   renderShapesPanel();
 }
 
-/******************************************************************************
- * 16) ON LOAD
- ******************************************************************************/
 window.addEventListener('load', () => {
   initGame();
 
@@ -428,6 +390,7 @@ window.addEventListener('load', () => {
   document.getElementById('reset-button').addEventListener('click', resetGame);
 
   // If you still have a "switch-mode-button" for Tetris mode:
+  
   const switchBtn = document.getElementById('switch-mode-button');
   if (switchBtn) {
     switchBtn.addEventListener('click', function() {

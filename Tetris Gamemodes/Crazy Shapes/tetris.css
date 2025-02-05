@@ -1,71 +1,125 @@
-/* Basic body styling */
-body {
+/* Global box-sizing for consistency */
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* Basic body styling */
+  body {
     background-color: gray;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
-    flex-direction: column;
     font-family: Arial, sans-serif;
-}
-
-/* Main container to center the game and button container horizontally */
-#main-container {
-    display: flex;
-    flex-direction: row; /* Arrange items horizontally */
-    align-items: center; /* Align items to the top */
-    justify-content: center; /* Align everything to the left */
-    width: 100%; /* Full width of the page */
-}
-
-/* Game layout settings */
-#game-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 45px;
-}
-
-/* Canvas styling */
-#game-canvas {
-    border: 5px solid white;
-    background-color: black;
-}
-
-h1 {
+    text-align: center; /* Centers inline content like text */
+    /* Add top padding to account for the fixed title */
+    padding-top: 100px;
+  }
+  
+  /* Title styling (fixed at the top) */
+  h1 {
     font-size: 55px;
-    margin-bottom: 20px;
-    position: absolute; /* Or use fixed */
-    top: 0px;
+    position: fixed;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%; 
+    width: 100%;
     margin: 0;
-    text-align: center;
-    z-index: 10; /* Ensure it's above other content */
-}
-
-.score-box {
+    padding: 20px 0;
+    z-index: 10;
+  }
+  
+  
+  /* Score container: displays score boxes in a row */
+  .score-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px auto;
+  }
+  
+  /* Score box styling */
+  .score-box {
+    white-space: nowrap;
     font-size: 18px;
-    color: white;
     font-weight: bold;
-    text-align: center; /* Centers the score container */
-    display: inline-block;
-    width: 150px;
+    min-width: 150px;
     padding: 7px;
-    margin-right: 10px;
-    margin-bottom: 5px;
     background-color: #333;
     color: #fff;
-    font-size: 18px;
-    text-align: center;
     border-radius: 5px;
-}
+    text-align: center;
+  }
+  
+  /* Game board wrapper: centers the game board */
+  #game-board-wrapper {
+    position: relative;
+    width: 300px;        /* Fixed width for game board */
+    margin: 10px auto;   /* Center horizontally */
+    overflow: visible;   /* Allow the next-piece canvas to overflow */
+  }
+  
+  /* Main game canvas styling */
+  #game-canvas {
+    display: block;
+    width: 300px;
+    height: 600px;
+    border: 5px solid white;
+    background-color: black;
+    margin-left: 2px;
+  }
+  
+  /* Next-piece canvas styling */
+  /* It is absolutely positioned inside #game-board-wrapper */
+  #next-piece-canvas {
+    position: absolute;
+    top: 50px;;              /* Align with the top of the game board */
+    left: 310px;         /* 300px (game board width) + 10px gap */
+    width: 120px;
+    height: 120px;
+    border: 5px solid white;
+    background-color: black;
+    box-sizing: border-box;
+  }
+  
+  /* Reset button styling */
+  #reset-button {
+    display: block;
+    margin: 20px auto;
+    font-weight: bold;
+    padding: 10px 20px;
+    background-color: gray;
+    border: none;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    transition: 0.4s;
+    width: 200px;
+  }
+  
+  #reset-button:hover {
+    background-color: #000;
+    color: white;
+  }
+  
+  /* Music control button styling (unchanged) */
+  #music-control-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #4cd137;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  
+  #music-control-button:hover {
+    background-color: #44bd32;
+  }
 
-/* Original button size */
-.button {
+  /* Style the Back to Tetris button and remove excess gap */
+#switch-mode-button {
     font-weight: bold;
     padding: 10px 20px;
     background-color: gray;
@@ -77,43 +131,13 @@ h1 {
     width: auto; /* Let the buttons have their original size */
 }
 
-.button:hover {
-    background-color: #000000;
+/* Hover effect for the button */
+#switch-mode-button:hover {
+    background-color: #ff3b30;
+    transform: scale(1.05);
     color: white;
 }
 
-/* Dropdown menu styling */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content{
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: #f9f9f9;
-    min-width: 100%; 
-    max-width: 175px; 
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-  
-/* Reset button styling */
 #reset-button {
     font-weight: bold;
     padding: 10px 20px;
@@ -127,15 +151,8 @@ h1 {
     transition: background-color 0.3s;
     margin-top: 5px;
     width: auto; /* uses original width */
-}
+  }
 
-#reset-button:hover {
-    background-color: #042f5e;
-}
-
-.space {
+  .space {
     opacity: 0;
 }
-
-
-

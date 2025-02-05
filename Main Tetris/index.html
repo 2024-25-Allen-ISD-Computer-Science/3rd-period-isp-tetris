@@ -7,8 +7,6 @@
        <meta name="viewport" content="width=device-width, initial-scale=1">
        <link rel="stylesheet" href="tetris.css">
        <title>Tetris Game</title>
-       <style>
-       </style>
    </head>
    <body>
        <!-- Background Music -->
@@ -40,7 +38,8 @@
                        <button id="toggle-mode" class="button">Change Game Mode</button>
                        <div class="dropdown-content">
                            <!-- 2X Speed Game Mode -->
-                           <a href="http://127.0.0.1:5513/Tetris%20Ultimate%20Speed/index.html">Ultimate Speed</a>
+                           <a href="http://127.0.0.1:5500/Tetris%20Gamemodes/Ultimate%20Speed/index.html">Ultimate Speed</a>
+                           <a href="http://127.0.0.1:5500/Tetris%20Gamemodes/Crazy%20Shapes/index.html">Crazy Shapes</a>
                        </div>
                    </div>
                    
@@ -53,8 +52,11 @@
                        <div class="score-box" id="score">Score: 0</div>
                        <div class="score-box" id="high-score">High Score: 0</div>
                    </div>
-                  
-                   <canvas id="game-canvas" width="300" height="600"></canvas>               
+                   <!-- Container for the game canvas; this container is centered -->
+                   <div id="game-canvas-container">
+                       <canvas id="game-canvas" width="300" height="600"></canvas>
+                       <canvas id="next-piece-canvas" width="120" height="120"></canvas>
+                   </div>
                    <button id="reset-button">Reset Game</button>
                </div>
            </div>
@@ -68,8 +70,5 @@
        <script src="./piece.js"></script>
        <script src="./gamemodel.js"></script>
        <script src="./tetris.js"></script>
-
-       
    </body>
 </html>
-

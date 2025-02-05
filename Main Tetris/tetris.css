@@ -10,7 +10,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#full-game{
+#full-game {
     align-content: center;
     padding-right: 205px;
 }
@@ -20,7 +20,7 @@ body {
     display: flex;
     flex-direction: row; /* Arrange items horizontally */
     align-items: flex-start; /* Align items to the top */
-    width: 100%; /* Full width of the page */
+    width: 100%;
 }
 
 /* Button container with stacked buttons */
@@ -30,52 +30,77 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;  /* Button spacing */
-    margin-right: 10px; /* Game Spacing */
-    
+    margin-right: 10px; /* Spacing between buttons and game area */
 }
 
 /* Game layout settings */
 #game-container {
     display: flex;
-    justify-content: center;
     flex-direction: column;
     align-items: center;
 }
 
-/* Canvas styling */
+/* Score container: display scores side by side */
+.score-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;  /* Gap between score boxes */
+    margin-bottom: 10px;
+}
+
+/* Score box styling */
+.score-box {
+    white-space: nowrap;  /* Prevent the text from wrapping */
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 150px;  /* Minimum width for each score box */
+    padding: 7px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 5px;
+    margin-top: 8px;
+}
+
+/* Container for the game canvas; this container is centered */
+#game-canvas-container {
+    position: relative;
+    width: 300px; /* Match game canvas width */
+    margin: 0 auto;
+}
+
+/* Canvas styling for the game board */
 #game-canvas {
+    display: block;
+    width: 300px;
+    height: 600px;
     border: 5px solid white;
     background-color: black;
 }
 
+/* Next piece preview positioned to the right of the game canvas */
+#next-piece-canvas {
+    position: absolute;
+    top: 50px; /* Adjust vertical offset as needed */
+    left: 310px; /* 300px (game canvas width) + 10px gap */
+    width: 120px;
+    height: 120px;
+    border: 5px solid white;
+    background-color: black;
+}
+
+/* Title styling */
 h1 {
     font-size: 55px;
     margin-bottom: 20px;
-    position: absolute; /* Or use fixed */
+    position: absolute;
     top: 0px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%; 
+    width: 100%;
     margin: 0;
     text-align: center;
-    z-index: 10; /* Ensure it's above other content */
-}
-
-.score-box {
-    font-size: 18px;
-    color: white;
-    font-weight: bold;
-    text-align: center; /* Centers the score container */
-    display: inline-block;
-    width: 150px;
-    padding: 7px;
-    margin-right: 10px;
-    margin-bottom: 5px;
-    background-color: #333;
-    color: #fff;
-    font-size: 18px;
-    text-align: center;
-    border-radius: 5px;
+    z-index: 10;
 }
 
 /* Original button size */
@@ -83,12 +108,12 @@ h1 {
     font-weight: bold;
     padding: 10px 20px;
     background-color: gray;
-    border: none; /* Removed border */
+    border: none;
     font-size: 16px;
     color: white;
     cursor: pointer;
     transition: 0.4s;
-    width: 200px; /* Let the buttons have their original size */
+    width: 200px;
     height: auto;
 }
 
@@ -103,14 +128,14 @@ h1 {
     display: inline-block;
 }
 
-.dropdown-content{
+.dropdown-content {
     text-align: center;
     display: none;
     position: absolute;
     right: 0;
     background-color: #f9f9f9;
-    min-width: 100%; 
-    max-width: 175px; 
+    min-width: 100%;
+    max-width: 175px;
     z-index: 1;
 }
 
@@ -128,7 +153,7 @@ h1 {
 .dropdown:hover .dropdown-content {
     display: block;
 }
-  
+
 /* Reset button styling */
 #reset-button {
     font-weight: bold;
@@ -136,47 +161,45 @@ h1 {
     font-size: 16px;
     color: #fff;
     background-color: #007bff;
-    border: none; /* Removed border */
+    border: none;
     border-radius: 8px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s;
     margin-top: 5px;
     margin-bottom: 7px;
-    width: auto; /* uses original width */
 }
 
 #reset-button:hover {
     background-color: #042f5e;
 }
 
-.dropdown .dropdown-content button#double-speed  {
-    background-color: #f0f0f0; /* Light background */
-    color: #333; /* Dark text */
+.dropdown .dropdown-content button#double-speed {
+    background-color: #f0f0f0;
+    color: #333;
     padding: 10px 15px;
     border: 1px solid #ccc;
     cursor: pointer;
     margin-top: 20px;
 }
 
-/* Slightly darker background on hover */
 .dropdown .dropdown-content button#double-speed:hover {
-    background-color: #ddd; 
+    background-color: #ddd;
 }
 
-.dropdown .dropdown-content button#normal-speed  {
-    background-color: #f0f0f0; /* Light background */
-    color: #333; /* Dark text */
+.dropdown .dropdown-content button#normal-speed {
+    background-color: #f0f0f0;
+    color: #333;
     padding: 10px 15px;
     border: 1px solid #ccc;
     cursor: pointer;
 }
 
-/* Slightly darker background on hover */
 .dropdown .dropdown-content button#normal-speed:hover {
-    background-color: #ddd; 
+    background-color: #ddd;
 }
 
+/* Music control button styling */
 #music-control-button {
     position: fixed;
     bottom: 20px;
@@ -193,4 +216,12 @@ h1 {
 
 #music-control-button:hover {
     background-color: #44bd32;
+}
+
+/* Apply box-sizing globally for consistency - 
+so I don’t have to manually calculate extra space for padding and borders */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }

@@ -34,19 +34,20 @@ h1 {
 
 #board {
   display: grid;
-  grid-template-columns: repeat(10, 40px); /* Increased from 30px */
-  grid-template-rows: repeat(10, 40px);    /* Increased from 30px */
-  gap: 3px; /* Slightly larger gap to maintain spacing */
-  background: #555;
-  padding: 6px; /* Increased padding slightly */
+  grid-template-columns: repeat(10, 40px); 
+  grid-template-rows: repeat(10, 40px);    
+  background: #fff;
+  padding: 6px; /* outside of grid */
+  gap: .5px;
 }
 
 .cell {
-  width: 40px; /* Increased from 30px */
-  height: 40px; /* Increased from 30px */
-  background: #ccc;
+  width: 40px; 
+  height: 40px; 
+  background: #000000;
   box-sizing: border-box;
   transition: background 0.2s;
+  /* gradually changes over the course of .2 sec */
 }
 
 /* Filled cells on the board */
@@ -54,13 +55,12 @@ h1 {
   background: #4e8ef7; /* Filled block color */
 }
 
-/* Hover preview styles */
-.hover-valid {
-  background: rgba(0, 255, 0, 0.4) !important; /* Light green overlay */
-}
-.hover-invalid {
-  background: rgba(255, 0, 0, 0.4) !important; /* Light red overlay */
-}
+.hover-valid { 
+  background: rgba(0, 255, 0, 0.4) !important; 
+} 
+.hover-invalid { 
+  background: rgba(255, 0, 0, 0.4) !important; 
+} 
 
 /* ===== Shapes Panel ===== */
 #shapes-panel {
@@ -88,8 +88,8 @@ h1 {
 }
 
 .shape-container.selected .shape-block {
-  transform: scale(1.2);       /* blocks grow ~10% larger */
-  transform-origin: center;    /* keep them centered while scaling */
+  transform: scale(1.2);       /* increases block size by 20% */
+  transform-origin: center;    /* keep centered while increasing size */
 }
 
 /* Empty cells in the shape's bounding box—transparent so the shape stands out */
@@ -119,7 +119,7 @@ h1 {
 }
 
 .button:hover {
-  background-color: #000000;
+  background-color: #ff3b30;
   color: white;
 }
 
@@ -154,3 +154,4 @@ h1 {
   margin-top: 5px;
   width: auto; /* uses original width */
 }
+

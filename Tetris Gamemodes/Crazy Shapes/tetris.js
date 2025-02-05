@@ -1,13 +1,21 @@
+// Canvas setup for the main game board
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 
+// Next Piece Preview Canvas setup
+const nextPieceCanvas = document.getElementById("next-piece-canvas");
+const nextCtx = nextPieceCanvas.getContext("2d");
+
+// Game variables
 let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));  
 let currentPiece = null;
+let nextPiece = null; // Global variable for the upcoming piece
 let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameOver = false;
 let gameInterval = null;  // Track the game interval for consistent speed
 
+// Event listeners
 const resetButton = document.getElementById("reset-button"); // reset button
 resetButton.addEventListener("click", () => {  
   startGame();  
@@ -19,6 +27,8 @@ let confettiSpawnTime = 0;  // Time when confetti should stop spawning
 let tetrisMessageShown = false;  // Flag to control Tetris message visibility
 let tetrisMessageStartTime = 0;  // Time when Tetris message should disappear
 
+// DRAWING FUNCTIONS
+
 // Draw the game board
 function drawBoard() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);  
@@ -27,12 +37,18 @@ function drawBoard() {
       const color = board[row][col];
       if (color) {
         ctx.fillStyle = color;
-        ctx.fillRect(col * BLOCK_SIDE_LENGTH, row * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+        ctx.fillRect(
+          col * BLOCK_SIDE_LENGTH, 
+          row * BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH
+        );
       }
     }
   }
 }
 
+// Draw the current piece and its shadow
 function drawPiece() {
   if (!currentPiece) return;
 
@@ -44,49 +60,112 @@ function drawPiece() {
     row.forEach((cell, cIdx) => {
       if (cell) {
         ctx.fillStyle = currentPiece.color;
-        ctx.fillRect((currentPiece.x + cIdx) * BLOCK_SIDE_LENGTH, (currentPiece.y + rIdx) * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+        ctx.fillRect(
+          (currentPiece.x + cIdx) * BLOCK_SIDE_LENGTH, 
+          (currentPiece.y + rIdx) * BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH
+        );
       }
     });
   });
 }
 
+// Draw the shadow piece
 function drawShadowPiece() {
   if (!currentPiece) return;
 
-  // Copy the current piece to simulate the shadow piece
-  const shadowPiece = { ...currentPiece, y: currentPiece.y };  // Start from the current position
+  // Copy the current piece for simulating the shadow
+  const shadowPiece = { ...currentPiece, y: currentPiece.y };
   
   // Move the shadow piece down until it collides with the board
   while (!checkCollisionAt(shadowPiece)) {
-    shadowPiece.y++; // Keep moving down until collision
+    shadowPiece.y++;
   }
-
   shadowPiece.y--;  // Step back to the last valid position
 
-  // Draw the shadow piece
+  // Draw the shadow piece (gray with transparency)
   shadowPiece.shape.forEach((row, rIdx) => {
     row.forEach((cell, cIdx) => {
       if (cell) {
-        ctx.fillStyle = 'rgba(169, 169, 169, 0.5)';  // Gray with transparency for the shadow
-        ctx.fillRect((shadowPiece.x + cIdx) * BLOCK_SIDE_LENGTH, (shadowPiece.y + rIdx) * BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH, BLOCK_SIDE_LENGTH);
+        ctx.fillStyle = 'rgba(169, 169, 169, 0.5)'; 
+        ctx.fillRect(
+          (shadowPiece.x + cIdx) * BLOCK_SIDE_LENGTH, 
+          (shadowPiece.y + rIdx) * BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH, 
+          BLOCK_SIDE_LENGTH
+        );
       }
     });
   });
 }
 
+// Draw the next piece preview on its canvas
+function drawNextPiece() {
+  if (!nextPiece) return;
+  
+  // Clear the next piece canvas
+  nextCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
+  
+  // Optionally, draw a border around the preview area
+  nextCtx.strokeStyle = "#000";
+  nextCtx.strokeRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
+  
+  const shape = nextPiece.shape;
+  const rows = shape.length;
+  const cols = shape[0].length;
+  
+  // Use the same block size as the main game
+  const previewBlockSize = BLOCK_SIDE_LENGTH;
+  
+  // Center the next piece in the preview canvas
+  const offsetX = (nextPieceCanvas.width - cols * previewBlockSize) / 2;
+  const offsetY = (nextPieceCanvas.height - rows * previewBlockSize) / 2;
+  
+  // Draw each block of the next piece
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (shape[r][c]) {
+        nextCtx.fillStyle = nextPiece.color;
+        nextCtx.fillRect(
+          offsetX + c * previewBlockSize,
+          offsetY + r * previewBlockSize,
+          previewBlockSize,
+          previewBlockSize
+        );
+      }
+    }
+  }
+}
+
+// COLLISION CHECK
+
+// Check collision at a hypothetical piece position
 function checkCollisionAt(piece) {
   for (let row = 0; row < piece.shape.length; row++) {
     for (let col = 0; col < piece.shape[row].length; col++) {
       if (piece.shape[row][col]) {
         const newX = piece.x + col;
         const newY = piece.y + row;
-        if (newX < 0 || newX >= COLS || newY >= ROWS || board[newY][newX]) return true;
+        if (
+          newX < 0 || newX >= COLS || 
+          newY >= ROWS || 
+          board[newY][newX]
+        ) {
+          return true;
+        }
       }
     }
   }
   return false;
 }
 
+// Check collision for the current piece
+function checkCollision() {
+  return checkCollisionAt(currentPiece);
+}
+
+// PIECE GENERATION
 
 // Generate a new piece
 function generatePiece() {
@@ -99,7 +178,9 @@ function generatePiece() {
   };
 }
 
-// moves piece down
+// PIECE PLACEMENT AND LINES
+
+// Move piece down
 function movePieceDown() {
   if (gameOver) return;  // Prevent moving if the game is over
   currentPiece.y++;
@@ -107,40 +188,35 @@ function movePieceDown() {
     currentPiece.y--;
     placePiece();
     clearLines();
-    currentPiece = generatePiece();
-    if (checkCollision()) gameOver = true; // End the game if new piece collides
-  }
-}
-
-// drops piece to ground
-function dropPieceDown() {
-  if (gameOver) return; // Prevent moving if the game is over
-
-  // Teleport the piece to the lowest valid position
-  while (!checkCollision()) {
-      currentPiece.y++; // Move the piece down until it collides
-  }
-  currentPiece.y--; // Step back to the last valid position
-
-  // Place the piece and handle game state
-  placePiece();
-  clearLines();
-  currentPiece = generatePiece();
-  if (checkCollision()) gameOver = true; // End the game if new piece collides
-}
-
-// Check if the current piece collides with the board
-function checkCollision() {
-  for (let row = 0; row < currentPiece.shape.length; row++) {
-    for (let col = 0; col < currentPiece.shape[row].length; col++) {
-      if (currentPiece.shape[row][col]) {
-        const newX = currentPiece.x + col;
-        const newY = currentPiece.y + row;
-        if (newX < 0 || newX >= COLS || newY >= ROWS || board[newY][newX]) return true;
-      }
+    // Promote the next piece to be the current piece,
+    // then generate a new next piece and update the preview
+    currentPiece = nextPiece;
+    nextPiece = generatePiece();
+    drawNextPiece();
+    if (checkCollision()) {
+      gameOver = true; // End the game if new piece collides on spawn
     }
   }
-  return false;
+}
+
+// Drop piece down instantly
+function dropPieceDown() {
+  if (gameOver) return; 
+
+  while (!checkCollision()) {
+    currentPiece.y++;
+  }
+  currentPiece.y--;
+
+  placePiece();
+  clearLines();
+  // Promote the next piece and update the preview
+  currentPiece = nextPiece;
+  nextPiece = generatePiece();
+  drawNextPiece();
+  if (checkCollision()) {
+    gameOver = true;
+  }
 }
 
 // Place the current piece onto the board
@@ -154,29 +230,47 @@ function placePiece() {
   });
 }
 
-// Clear completed lines and update the score
+// Clear completed lines and update score
 function clearLines() {
-  let linesCleared = 0;  // Track the number of lines cleared
+  let linesCleared = 0;
   for (let row = ROWS - 1; row >= 0; row--) {
-    if (board[row].every(cell => cell)) {  // If the row is completely filled
-      board.splice(row, 1);  // Remove the filled row
-      board.unshift(Array(COLS).fill(null));  // Add an empty row at the top
+    if (board[row].every(cell => cell)) {
+      board.splice(row, 1);
+      board.unshift(Array(COLS).fill(null));
       score += SCORE_WORTH;
-      linesCleared++;  // Increment linesCleared count
-      row++;  // Stay on the same row index after clearing to recheck for consecutive filled rows
+      linesCleared++;
+      row++;
     }
   }
-
-  // Trigger confetti effect and "Tetris!" message when 4 lines are cleared
   if (linesCleared === 4) {
-    launchConfetti();  // Launch the confetti animation
-    showTetrisMessage();  // Show the Tetris message on the screen
-    score += 800;  // Increase score by 800 after clearing 4 lines
-    drawScore();  // Update score display
+    launchConfetti();
+    showTetrisMessage();
+    score += 800; // Tetris bonus
+    drawScore();
   }
 }
 
-// Function to display the Tetris message on the canvas
+// GRID DRAWING
+
+// Draw the grid lines on the canvas
+function drawGrid() {
+  ctx.beginPath();
+  ctx.strokeStyle = '#555'; // Grid line color
+  ctx.lineWidth = 1;        // Grid line thickness
+
+  for (let col = 0; col <= COLS; col++) {
+    ctx.moveTo(col * BLOCK_SIDE_LENGTH, 0);
+    ctx.lineTo(col * BLOCK_SIDE_LENGTH, ROWS * BLOCK_SIDE_LENGTH);
+  }
+  for (let row = 0; row <= ROWS; row++) {
+    ctx.moveTo(0, row * BLOCK_SIDE_LENGTH);
+    ctx.lineTo(COLS * BLOCK_SIDE_LENGTH, row * BLOCK_SIDE_LENGTH);
+  }
+  ctx.stroke();
+}
+
+// SCORE AND MESSAGES
+
 function showTetrisMessage() {
   if (!tetrisMessageShown) {
     tetrisMessageStartTime = Date.now();
@@ -184,7 +278,6 @@ function showTetrisMessage() {
   }
 }
 
-// Update high score in localStorage
 function updateHighScore() {
   if (score > highScore) {
     highScore = score;
@@ -192,13 +285,13 @@ function updateHighScore() {
   }
 }
 
-// Draw the score and high score in HTML 
 function drawScore() {
   document.getElementById("score").innerText = "Score: " + score;
   document.getElementById("high-score").innerText = "High Score: " + highScore;
 }
 
-// Game loop function
+// GAME LOOP AND CONFETTI
+
 function gameLoop() {
   if (gameOver) {
     clearInterval(gameInterval);
@@ -207,17 +300,18 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
     ctx.font = '30px Arial';
-    ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
     return;
   }
 
   movePieceDown();
   drawBoard();
+  drawGrid();
   drawPiece();
   drawScore();
-  updateConfetti();  // Update and draw confetti
+  updateConfetti();
 
-  // Show the Tetris message for a short period (1 second)
   if (tetrisMessageShown && Date.now() - tetrisMessageStartTime < 1000) {
     ctx.fillStyle = 'gold';
     ctx.font = '40px Arial';
@@ -226,268 +320,134 @@ function gameLoop() {
   }
 }
 
-// Initialize the game
-function startGame() {
-  clearInterval(gameInterval);  // Clear any existing intervals to avoid speeding up
-  board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-  currentPiece = generatePiece();
-  score = 0;
-  gameOver = false;
-  confettiArray = [];  // Reset confetti
-  confettiSpawnTime = Date.now();  // Start tracking confetti spawn time
-  tetrisMessageShown = false;  // Reset Tetris message
-  gameInterval = setInterval(gameLoop, GAME_CLOCK);  // Restart the game loop
-}
-
-// Event listeners for movement (WASD keys)
-document.addEventListener("keydown", (event) => {
-  if (gameOver) return; // Prevent key actions if the game is over
-
-  switch (event.key) {
-    case "a":  // Move left
-      currentPiece.x--;
-      if (checkCollision()) currentPiece.x++;
-      break;
-    case "d":  // Move right
-      currentPiece.x++;
-      if (checkCollision()) currentPiece.x--;
-      break;
-    case "s":  // Move down
-      dropPieceDown();
-      break;
-    case "w":  // Rotate clockwise
-      rotatePiece();
-      if (checkCollision()) rotatePiece(true);  // Undo if collision occurs
-      break;
-  }
-  drawBoard();
-  drawPiece();
-});
-
-// Rotate the piece clockwise
-function rotatePiece() {
-  const originalShape = currentPiece.shape;
-  currentPiece.shape = currentPiece.shape[0].map((_, idx) =>
-    currentPiece.shape.map(row => row[idx]).reverse()
-  );
-  if (checkCollision()) currentPiece.shape = originalShape;  // Revert if collision occurs
-}
-
-// Trigger the start of the game
-startGame();
-
-// Function to launch the confetti
 function launchConfetti() {
-  // Set spawn time for 1 second
   confettiSpawnTime = Date.now();
-
-    const confettiCount = 75;  // Increase to 75 confetti pieces
+  const confettiCount = 75;
   for (let i = 0; i < confettiCount; i++) {
-    const width = Math.random() * 8 + 5;  // Smaller width for each piece
-    const height = Math.random() * 8 + 5;  // Smaller height for each piece
+    const width = Math.random() * 8 + 5;
+    const height = Math.random() * 8 + 5;
     const confettiPiece = {
-    x: Math.random() * (canvas.width - width),  // Spread across the whole canvas width, but avoid overflows
-    y: Math.random() * canvas.height / 2 + canvas.height / 4,  // Start lower on the screen
-    width: width,
-    height: height,
-    color: `hsl(${Math.random() * 360}, 100%, 60%)`,  // Softer color palette
-    speedY: Math.random() * 4 + 4,  // Increased falling speed, but slightly less than before
-    speedX: Math.random() * 3 - 1.5,  // Random horizontal movement to spread out
-    startTime: Date.now() // Time when confetti started
+      x: Math.random() * (canvas.width - width),
+      y: Math.random() * (canvas.height / 2) + (canvas.height / 4),
+      width: width,
+      height: height,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+      speedY: Math.random() * 4 + 4,
+      speedX: Math.random() * 3 - 1.5,
+      startTime: Date.now()
     };
     confettiArray.push(confettiPiece);
   }
 }
 
-// Update and draw confetti
 function updateConfetti() {
   const now = Date.now();
-
-  // Remove confetti after 2 seconds
-  confettiArray = confettiArray.filter(piece => now - piece.startTime < 2000);  // Keep for 2 seconds
-
-  // Update each piece's position and remove if out of screen
+  confettiArray = confettiArray.filter(piece => now - piece.startTime < 2000);
   for (let i = 0; i < confettiArray.length; i++) {
     const piece = confettiArray[i];
-    piece.y += piece.speedY;  // Make them fall at a faster speed
-    piece.x += piece.speedX;  // Random horizontal movement
-
-    // Draw each confetti piece
+    piece.y += piece.speedY;
+    piece.x += piece.speedX;
     ctx.fillStyle = piece.color;
     ctx.fillRect(piece.x, piece.y, piece.width, piece.height);
   }
 }
 
-
-
-//Gamemodel
-class GameModel {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.fallingPiece = null;
-        this.grid = this.makeStartingGrid();
-        this.gameOver = false; // Add game over flag
-    }
-
-    makeStartingGrid() {
-        let grid = [];
-        for (var i = 0; i < ROWS; i++) {
-            grid.push([]);
-            for (var j = 0; j < COLS; j++) {
-                grid[grid.length - 1].push(0);
-            }
-        }
-        return grid;
-    }
-
-    collision(x, y) {
-        const shape = this.fallingPiece.shape;
-        const n = shape.length;
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < n; j++) {
-                if (shape[i][j] > 0) {
-                    let p = x + j;
-                    let q = y + i;
-                    if (p >= 0 && p < COLS && q < ROWS) {
-                        if (this.grid[q][p] > 0) {
-                            return true;
-                        }
-                    } else {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    renderGameState() {
-        this.ctx.clearRect(0, 0, COLS, ROWS); // Clear the canvas before rendering
-        for (let i = 0; i < this.grid.length; i++) {
-            for (let j = 0; j < this.grid[i].length; j++) {
-                let cell = this.grid[i][j];
-                if (cell > 0) { // Only render filled cells
-                    this.ctx.fillStyle = COLORS[cell - 1]; // Use -1 for 0-based index
-                    this.ctx.fillRect(j, i, 1, 1);
-                }
-            }
-        }
-
-        if (this.fallingPiece !== null) {
-            this.fallingPiece.renderPiece();
-        }
-    }
-
-    moveDown() {
-        if (this.fallingPiece === null || this.gameOver) {
-            this.renderGameState();
-            return; // No more movement if game is over
-        } else if (this.collision(this.fallingPiece.x, this.fallingPiece.y + 1)) {
-            const shape = this.fallingPiece.shape;
-            const x = this.fallingPiece.x;
-            const y = this.fallingPiece.y;
-            shape.map((row, i) => {
-                row.map((cell, j) => {
-                    let p = x + j;
-                    let q = y + i;
-                    if (p >= 0 && p < COLS && q < ROWS && cell > 0) {
-                        this.grid[q][p] = shape[i][j];
-                    }
-                });
-            });
-
-            // check game over
-            if (this.fallingPiece.y === 0) {
-                this.gameOver = true; // Set game over flag
-                alert("Game over!");
-                return; // Stop the game immediately when game over
-            }
-            this.fallingPiece = null;
-        } else {
-            this.fallingPiece.y += 1;
-        }
-        this.renderGameState();
-    }
-
-    move(right) {
-        if (this.fallingPiece === null || this.gameOver) {
-            return; // No more movement if game is over
-        }
-
-        let x = this.fallingPiece.x;
-        let y = this.fallingPiece.y;
-        if (right) {
-            // move right
-            if (!this.collision(x + 1, y)) {
-                this.fallingPiece.x += 1;
-            }
-        } else {
-            // move left
-            if (!this.collision(x - 1, y)) {
-                this.fallingPiece.x -= 1;
-            }
-        }
-        this.renderGameState();
-    }
-
-    rotate() {
-        if (this.fallingPiece !== null && !this.gameOver) {
-            let shape = this.fallingPiece.shape;
-            for (let y = 0; y < shape.length; ++y) {
-                for (let x = 0; x < y; ++x) {
-                    [this.fallingPiece.shape[x][y], this.fallingPiece.shape[y][x]] =
-                        [this.fallingPiece.shape[y][x], this.fallingPiece.shape[x][y]];
-                }
-            }
-            // Reverse order of rows
-            this.fallingPiece.shape.forEach((row) => row.reverse());
-        }
-        this.renderGameState();
-    }
-
-    resetGame() {
-        this.grid = this.makeStartingGrid();
-        this.fallingPiece = null;
-        this.gameOver = false; // Reset game over flag
-    }
+const switchBtn = document.getElementById('switch-mode-button');
+if (switchBtn) {
+  switchBtn.addEventListener('click', function() {
+    window.location.href = "http://127.0.0.1:5500/Main%20Tetris/index.html";
+  });
 }
 
-//Back to normal tetris game mode button
-document.getElementById("switch-mode-button").addEventListener("click", function() {
-    window.location.href = "http://127.0.0.1:5500/Main%20Tetris/index.html"; 
+// Rotate function (disables rotation if collision occurs)
+function rotatePiece(undo = false) {
+  const originalShape = JSON.parse(JSON.stringify(currentPiece.shape));
+  currentPiece.shape = currentPiece.shape[0].map((_, idx) =>
+    currentPiece.shape.map(row => row[idx]).reverse()
+  );
+  if (checkCollision()) {
+    if (undo) {
+      currentPiece.shape = originalShape;
+    } else {
+      rotatePiece(true); // Undo rotation
+    }
+  }
+}
+
+// Initialize game
+function startGame() {
+  clearInterval(gameInterval);
+  board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  currentPiece = generatePiece();
+  // Initialize nextPiece and immediately draw its preview
+  nextPiece = generatePiece();
+  drawNextPiece();
+  score = 0;
+  gameOver = false;
+  confettiArray = [];
+  confettiSpawnTime = Date.now();
+  tetrisMessageShown = false;
+  drawScore();
+  gameInterval = setInterval(gameLoop, GAME_CLOCK);
+}
+
+startGame();
+
+// User Input
+document.addEventListener("keydown", (event) => {
+  if (gameOver) return; // Prevent key actions if game is over
+
+  switch (event.key) {
+    case "a":
+      currentPiece.x--;
+      if (checkCollision()) currentPiece.x++;
+      break;
+    case "d":
+      currentPiece.x++;
+      if (checkCollision()) currentPiece.x--;
+      break;
+    case "s":
+      dropPieceDown();
+      break;
+    case "w":
+      rotatePiece();
+      if (checkCollision()) rotatePiece(true);
+      break;
+    
+    case "A":
+      currentPiece.x--;
+      if (checkCollision()) currentPiece.x++;
+      break;
+    case "D":
+      currentPiece.x++;
+      if (checkCollision()) currentPiece.x--;
+      break;
+    case "S":
+      dropPieceDown();
+      break;
+    case "W":
+      rotatePiece();
+      if (checkCollision()) rotatePiece(true);
+      break;
+    
+    case "ArrowLeft":
+      currentPiece.x--;
+      if (checkCollision()) currentPiece.x++;
+      break;
+    case "ArrowRight":
+      currentPiece.x++;
+      if (checkCollision()) currentPiece.x--;
+      break;
+    case "ArrowDown":
+      dropPieceDown();
+      break;
+    case "ArrowUp":
+      rotatePiece();
+      if (checkCollision()) rotatePiece(true);
+      break;
+  }
+
+  drawBoard();
+  drawGrid();
+  drawPiece();
 });
-
-
-
-//Piece
-class Piece {
-    constructor(shape, ctx, initialX = Math.floor(COLS / 2), initialY = -2) {
-        this.shape = shape;
-        this.ctx = ctx;
-        this.y = initialY; 
-        this.x = initialX; 
-    }
-
-    renderPiece() {
-        this.shape.forEach((row, i) => {
-            row.forEach((cell, j) => {
-                if (cell > 0) {
-                    const renderY = this.y + i;
-                    if (renderY < ROWS) {  // Allow rendering even with negative `y`
-                        this.ctx.fillStyle = COLORS[cell - 1];
-                        this.ctx.fillRect(this.x + j, renderY, 1, 1); 
-                    }
-                }
-            });
-        });
-    }
-
-    setPosition(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-
-
-
