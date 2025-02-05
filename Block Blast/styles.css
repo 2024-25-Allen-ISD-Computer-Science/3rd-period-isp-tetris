@@ -32,7 +32,6 @@ h1 {
   gap: 1rem;
 }
 
-/* ===== Board Styles ===== */
 #board {
   display: grid;
   grid-template-columns: repeat(10, 40px); /* Increased from 30px */
