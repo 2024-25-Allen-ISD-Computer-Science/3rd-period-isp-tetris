@@ -78,10 +78,10 @@ body {
     background-color: black;
 }
 
-/* Next piece preview positioned to the right of the game canvas */
+
 #next-piece-canvas {
     position: absolute;
-    top: 50px; /* Adjust vertical offset as needed */
+    top: 50px;
     left: 310px; /* 300px (game canvas width) + 10px gap */
     width: 120px;
     height: 120px;

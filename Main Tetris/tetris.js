@@ -100,29 +100,26 @@ function drawShadowPiece() {
   });
 }
 
-// Draw the next piece preview immediately
+// Next piece function
 function drawNextPiece() {
   if (!nextPiece) return;
   
-  // Clear the preview canvas
+  // Clears the entire preview canvas
   nextCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
   
-  // Optionally, draw a border around the preview canvas
-  nextCtx.strokeStyle = "#000";
-  nextCtx.strokeRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
-  
+  // Retreives shape and its dimensions from constants
   const shape = nextPiece.shape;
   const rows = shape.length;
   const cols = shape[0].length;
   
-  // Set a preview block size (adjust as desired)
+  // Sets the size of each block for the preview
   const previewBlockSize = BLOCK_SIDE_LENGTH;
   
-  // Center the piece within the preview canvas
+  // Calculates horizontal and vertical offset margins to center piece
   const offsetX = (nextPieceCanvas.width - cols * previewBlockSize) / 2;
   const offsetY = (nextPieceCanvas.height - rows * previewBlockSize) / 2;
   
-  // Draw each cell of the next piece
+  // Checks each cell and fills in if necessary
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (shape[r][c]) {
@@ -353,49 +350,25 @@ document.addEventListener("keydown", (event) => {
 
   switch (event.key) {
     case "a": // left (WASD)
+    case "A":
+    case "ArrowLeft":
       currentPiece.x--;
       if (checkCollision()) currentPiece.x++;
       break;
     case "d": // right (WASD)
+    case "D":
+    case "ArrowRight":
       currentPiece.x++;
       if (checkCollision()) currentPiece.x--;
       break;
     case "s": // drop (WASD)
+    case "S": 
+    case "ArrowDown":
       dropPieceDown();
       break;
     case "w": // rotate (WASD)
-      rotatePiece();
-      break;
-    
-    // Still works if caps lock is enabled
-    case "A": 
-      currentPiece.x--;
-      if (checkCollision()) currentPiece.x++;
-      break;
-    case "D": 
-      currentPiece.x++;
-      if (checkCollision()) currentPiece.x--;
-      break;
-    case "S": 
-      dropPieceDown();
-      break;
-    case "W": 
-      rotatePiece();
-      break;
-
-    // Optional arrow keys 
-    case "ArrowLeft": 
-      currentPiece.x--;
-      if (checkCollision()) currentPiece.x++;
-      break;
-    case "ArrowRight": 
-      currentPiece.x++;
-      if (checkCollision()) currentPiece.x--;
-      break;
-    case "ArrowDown": 
-      dropPieceDown();
-      break;
-    case "ArrowUp": 
+    case "W":
+    case "ArrowUp":
       rotatePiece();
       break;
   }
@@ -464,6 +437,6 @@ function updateConfetti() {
 const switchBtn = document.getElementById('switch-mode-button');
 if (switchBtn) {
   switchBtn.addEventListener('click', function() {
-    window.location.href = "http://127.0.0.1:5500/Block%20Blast/index.html";
+    window.location.href = "http://127.0.0.1:5501/Block%20Blast/index.html";
   });
 }

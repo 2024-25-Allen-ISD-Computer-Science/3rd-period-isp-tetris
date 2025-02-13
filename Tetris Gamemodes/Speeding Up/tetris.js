@@ -15,6 +15,9 @@ let highScore = localStorage.getItem('highScore') || 0;
 let gameOver = false;
 let gameInterval = null;  // Track the game interval for consistent speed
 
+let speedIncreaseFactor = 0.98; // 2% faster each cycle
+let currentGameClock = GAME_CLOCK;
+
 // Event listeners
 const resetButton = document.getElementById("reset-button"); // reset button
 resetButton.addEventListener("click", () => {  
@@ -312,13 +315,20 @@ function gameLoop() {
   drawScore();
   updateConfetti();
 
+  // Decrease speed gradually
+  currentGameClock = Math.max(100, currentGameClock * speedIncreaseFactor); 
+
+  clearInterval(gameInterval); // Reset interval
+  gameInterval = setInterval(gameLoop, currentGameClock); // Restart with new speed
+}
+
   if (tetrisMessageShown && Date.now() - tetrisMessageStartTime < 1000) {
     ctx.fillStyle = 'gold';
     ctx.font = '40px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Tetris! +800', canvas.width / 2, canvas.height / 2);
   }
-}
+
 
 function launchConfetti() {
   confettiSpawnTime = Date.now();
@@ -361,7 +371,7 @@ if (switchBtn) {
 
 // Rotate function (disables rotation if collision occurs)
 function rotatePiece(undo = false) {
-  const originalShape = JSON.parse(JSON.stringify(currentPiece.shape)); // Deep copy
+  const originalShape = JSON.parse(JSON.stringify(currentPiece.shape));
   currentPiece.shape = currentPiece.shape[0].map((_, idx) =>
     currentPiece.shape.map(row => row[idx]).reverse()
   );
@@ -374,12 +384,10 @@ function rotatePiece(undo = false) {
   }
 }
 
-// Initialize game
 function startGame() {
-  clearInterval(gameInterval);
+  clearInterval(gameInterval); // Stop any previous game loop
   board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   currentPiece = generatePiece();
-  // Initialize nextPiece and immediately draw its preview
   nextPiece = generatePiece();
   drawNextPiece();
   score = 0;
@@ -388,9 +396,13 @@ function startGame() {
   confettiSpawnTime = Date.now();
   tetrisMessageShown = false;
   drawScore();
-  gameInterval = setInterval(gameLoop, GAME_CLOCK);
-}
 
+  // Reset game speed when restarting
+  currentGameClock = GAME_CLOCK;
+  
+  // Start the game loop with adjustable speed
+  gameInterval = setInterval(gameLoop, currentGameClock);
+}
 startGame();
 
 // User Input

@@ -355,7 +355,7 @@ function updateConfetti() {
 const switchBtn = document.getElementById('switch-mode-button');
 if (switchBtn) {
   switchBtn.addEventListener('click', function() {
-    window.location.href = "http://127.0.0.1:5500/Main%20Tetris/index.html";
+    window.location.href = "http://127.0.0.1:5501/Main%20Tetris/index.html";
   });
 }
 
@@ -398,52 +398,27 @@ document.addEventListener("keydown", (event) => {
   if (gameOver) return; // Prevent key actions if game is over
 
   switch (event.key) {
-    case "a":
-      currentPiece.x--;
-      if (checkCollision()) currentPiece.x++;
-      break;
-    case "d":
-      currentPiece.x++;
-      if (checkCollision()) currentPiece.x--;
-      break;
-    case "s":
-      dropPieceDown();
-      break;
-    case "w":
-      rotatePiece();
-      if (checkCollision()) rotatePiece(true);
-      break;
-    
+    case "a": // left (WASD)
     case "A":
-      currentPiece.x--;
-      if (checkCollision()) currentPiece.x++;
-      break;
-    case "D":
-      currentPiece.x++;
-      if (checkCollision()) currentPiece.x--;
-      break;
-    case "S":
-      dropPieceDown();
-      break;
-    case "W":
-      rotatePiece();
-      if (checkCollision()) rotatePiece(true);
-      break;
-    
     case "ArrowLeft":
       currentPiece.x--;
       if (checkCollision()) currentPiece.x++;
       break;
+    case "d": // right (WASD)
+    case "D":
     case "ArrowRight":
       currentPiece.x++;
       if (checkCollision()) currentPiece.x--;
       break;
+    case "s": // drop (WASD)
+    case "S": 
     case "ArrowDown":
       dropPieceDown();
       break;
+    case "w": // rotate (WASD)
+    case "W":
     case "ArrowUp":
       rotatePiece();
-      if (checkCollision()) rotatePiece(true);
       break;
   }
 
