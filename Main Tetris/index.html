@@ -7,67 +7,11 @@
        <meta name="viewport" content="width=device-width, initial-scale=1">
        <link rel="stylesheet" href="tetris.css">
        <title>Tetris Game</title>
-       <style>
-           /* Styling for the Pause/Play Button */
-           #music-control-button {
-               position: fixed;
-               bottom: 20px;
-               right: 20px;
-               padding: 10px 20px;
-               background-color: #4cd137;
-               color: white;
-               border: none;
-               border-radius: 5px;
-               cursor: pointer;
-               font-size: 16px;
-               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-           }
-
-           #music-control-button:hover {
-               background-color: #44bd32;
-           }
-
-           /* Dropdown Styling */
-           .dropdown {
-               position: relative;
-               display: inline-block;
-           }
-
-           .dropdown-content {
-               display: none;
-               position: absolute;
-               background-color: #f9f9f9;
-               min-width: 160px;
-               box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-               z-index: 1;
-           }
-
-           .dropdown-content a {
-               color: black;
-               padding: 8px 12px;
-               text-decoration: none;
-               display: block;
-           }
-
-           .dropdown-content a:hover {
-               background-color: #f1f1f1;
-           }
-
-           .dropdown:hover .dropdown-content {
-               display: block;
-           }
-       </style>
    </head>
    <body>
        <!-- Background Music -->
        <audio id="background-music" autoplay loop>
            <source src="BlockGame.mp3" type="audio/mpeg">
-           Your browser does not support the audio element.
-       </audio>
-
-       <!-- Christmas Music -->
-       <audio id="christmas-music" loop>
-           <source src="xmas.mp3" type="audio/mpeg">
            Your browser does not support the audio element.
        </audio>
 
@@ -80,55 +24,43 @@
            <span class="tetris-letter" style="color: #8e44ad;">I</span>
            <span class="tetris-letter" style="color: #f39c12;">S</span>
        </h1>
-
-       <div id="spacer"></div>
+            <!-- Overlay for dimming the background -->
+        <div id="overlay"></div>
+        <div id="spacer"></div>
 
        <!-- Full Game Section -->
        <div id="full-game">
            <div id="main-container">
-               <!-- Button container on the left -->
-               <div id="button-container">
-                   <button id="switch-mode-button" class="button">Crazy Blocks</button>
 
-                   <div class="dropdown">
-                       <button id="toggle-mode" class="button">Change Game Mode</button>
-                       <div class="dropdown-content">
-<<<<<<< HEAD
-                           <!-- 2X Speed Game Mode -->
-                           <a href="http://127.0.0.1:5513/Tetris%20Ultimate%20Speed/index.html">Ultimate Speed</a>
-                       </div>
-                   </div>
-
-                   <!-- Theme Dropdown -->
-                   <div class="dropdown">
-                       <button id="theme-button" class="button">Change Theme</button>
-                       <div class="dropdown-content">
-                           <a href="#" id="theme-red">Red</a>
-                           <a href="#" id="theme-blue">Blue</a>
-                           <a href="#" id="theme-green">Green</a>
-                           <a href="#" id="theme-reset">Reset</a>
-                           <a href="#" id="theme-christmas">Christmas</a>
-                           <a href="#" id="theme-fall">Fall</a>
-                           <a href="#" id="theme-summer">Summer</a>
-=======
-                           <!-- Gamemodes -->
-                           <a href="http://127.0.0.1:5501/Tetris%20Gamemodes/Ultimate%20Speed/index.html">Ultimate Speed</a>
-                           <a href="http://127.0.0.1:5501/Tetris%20Gamemodes/Crazy%20Shapes/index.html">Crazy Shapes</a>
-                           <a href="http://127.0.0.1:5501/Tetris%20Gamemodes/Speeding%20Up/Index.html">Speeding Up</a>
->>>>>>> 119ef57 (Speeding up game mode)
-                       </div>
-                   </div>
-               </div>
-
+               <!-- Button container with Gear Icon -->
+                <div id="button-container">
+                    <button id="gear-button" class="gear-button">⚙</button>
+                    <div id="button-dropdown" class="dropdown-content">
+                        <button id="switch-mode-button" class="button">Crazy Blocks</button>
+                        <div class="dropdown">
+                            <button id="toggle-mode" class="button">Change Game Mode</button>
+                            <div class="dropdown-content">
+                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Ultimate%20Speed/index.html">Ultimate Speed</a>
+                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Crazy%20Shapes/index.html">Crazy Shapes</a>
+                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Speeding%20Up/Index.html">Speeding Up</a>
+                            </div>
+                        </div>
+                        <button id="theme-button" class="button">Block Themes</button>
+                        <button id="theme-button" class="button">Background Themes</button>
+                        <button id="reset-button" class="button">Reset Game</button>
+                    </div>
+                </div>
                <!-- Game container on the right -->
                <div id="game-container">
                    <div class="score-container">
                        <div class="score-box" id="score">Score: 0</div>
                        <div class="score-box" id="high-score">High Score: 0</div>
                    </div>
-
-                   <canvas id="game-canvas" width="300" height="600"></canvas>
-                   <button id="reset-button">Reset Game</button>
+                   <!-- Container for the game canvas; this container is centered -->
+                   <div id="game-canvas-container">
+                       <canvas id="game-canvas" width="300" height="600"></canvas>
+                       <canvas id="next-piece-canvas" width="120" height="120"></canvas>
+                   </div>
                </div>
            </div>
        </div>
@@ -141,107 +73,5 @@
        <script src="./piece.js"></script>
        <script src="./gamemodel.js"></script>
        <script src="./tetris.js"></script>
-
-       <script>
-           // Background music and control button logic
-           const music = document.getElementById('background-music');
-           const christmasMusic = document.getElementById('christmas-music');
-           const musicControlButton = document.getElementById('music-control-button');
-
-           // Set initial volume
-           music.volume = 0.5;
-           christmasMusic.volume = 0.5;
-
-           // Toggle music play/pause
-           musicControlButton.addEventListener('click', () => {
-               if (music.paused && christmasMusic.paused) {
-                   music.play();
-                   musicControlButton.textContent = 'Pause Music';
-               } else {
-                   music.pause();
-                   christmasMusic.pause();
-                   musicControlButton.textContent = 'Play Music';
-               }
-           });
-
-           // Theme logic
-           const COLORS_RED = ['#FF0000', '#FF4D4D', '#FF9999', '#FF6666', '#FFB3B3', '#FF8080', '#FF3333'];
-           const COLORS_GREEN = ['#00FF00', '#4DFF4D', '#99FF99', '#66FF66', '#B3FFB3', '#80FF80', '#33FF33'];
-           const COLORS_BLUE = ['#0000FF', '#4D4DFF', '#9999FF', '#6666FF', '#B3B3FF', '#8080FF', '#3333FF'];
-           const COLORS_CHRISTMAS = ['#FF0000', '#00FF00', '#FFFFFF', '#FF0000', '#00FF00', '#FFFFFF', '#FF0000'];
-           const COLORS_FALL = ['#D2691E', '#FF8C00', '#FFD700', '#8B4513', '#A52A2A', '#CD853F', '#F4A460'];
-           const COLORS_SUMMER = ['#00FFFF', '#FFD700', '#FF69B4', '#FFA500', '#FF4500', '#87CEEB', '#32CD32'];
-
-           const themeRedButton = document.getElementById('theme-red');
-           const themeBlueButton = document.getElementById('theme-blue');
-           const themeGreenButton = document.getElementById('theme-green');
-           const themeResetButton = document.getElementById('theme-reset');
-           const themeChristmasButton = document.getElementById('theme-christmas');
-           const themeFallButton = document.getElementById('theme-fall');
-           const themeSummerButton = document.getElementById('theme-summer');
-
-           themeRedButton.addEventListener('click', () => {
-               updateColors(COLORS_RED);
-               playDefaultMusic();
-           });
-
-           themeBlueButton.addEventListener('click', () => {
-               updateColors(COLORS_BLUE);
-               playDefaultMusic();
-           });
-
-           themeGreenButton.addEventListener('click', () => {
-               updateColors(COLORS_GREEN);
-               playDefaultMusic();
-           });
-
-           themeResetButton.addEventListener('click', () => {
-               updateColors(COLORS);
-               playDefaultMusic();
-           });
-
-           themeChristmasButton.addEventListener('click', () => {
-               updateColors(COLORS_CHRISTMAS);
-               playChristmasMusic();
-           });
-
-
-
-           function updateColors(newColors) {
-               // Ensure the colors array is reset properly
-               COLORS.length = 0;
-               newColors.forEach(color => COLORS.push(color));
-
-               // Restore visibility of all blocks
-               document.querySelectorAll('.block').forEach(block => {
-                   block.style.visibility = 'visible';
-               });
-           }
-
-           
-           themeFallButton.addEventListener('click', () => {
-    updateColors(COLORS_FALL);
-    playDefaultMusic();
-});
-
-
-
-themeSummerButton.addEventListener('click', () => {
-    updateColors(COLORS_SUMMER);
-    playDefaultMusic();
-});
-
-           function playDefaultMusic() {
-               christmasMusic.pause();
-               christmasMusic.currentTime = 0;
-               music.play();
-           }
-
-           function playChristmasMusic() {
-               music.pause();
-               music.currentTime = 0;
-               christmasMusic.play();
-           }
-       </script>
    </body>
 </html>

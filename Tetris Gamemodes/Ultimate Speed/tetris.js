@@ -1,46 +1,63 @@
-// Canvas setup for the main game board
+// ===========================
+// Canvas Setup
+// ===========================
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 
-// Next Piece Preview Canvas setup
 const nextPieceCanvas = document.getElementById("next-piece-canvas");
 const nextCtx = nextPieceCanvas.getContext("2d");
 
-// Game variables
-let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));  
+// ===========================
+// Game Variables & Speed Control
+// ===========================
+let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 let currentPiece = null;
 let nextPiece = null; // Global variable for the upcoming piece
 let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let gameOver = false;
-let gameInterval = null;  // Track the game interval for consistent speed
+let gameInterval = null;  // Track the game interval
 
-// Event listeners
-const resetButton = document.getElementById("reset-button"); // reset button
-resetButton.addEventListener("click", () => {  
-  startGame();  
+// Speed control: currentGameClock starts at GAME_CLOCK and decreases by 2% each cycle (min 100ms)
+let speedIncreaseFactor = 0.98; 
+let currentGameClock = GAME_CLOCK;
+
+// ===========================
+// Event Listeners
+// ===========================
+const resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", () => {
+  // Close gear dropdown and overlay if open
+  const buttonDropdown = document.getElementById("button-dropdown");
+  const overlay = document.getElementById("overlay");
+  buttonDropdown.classList.remove("active");
+  overlay.classList.remove("active");
+  startGame();
 });
 
-// Confetti array to store the falling squares
+// ===========================
+// Confetti Variables
+// ===========================
 let confettiArray = [];
-let confettiSpawnTime = 0;  // Time when confetti should stop spawning
-let tetrisMessageShown = false;  // Flag to control Tetris message visibility
-let tetrisMessageStartTime = 0;  // Time when Tetris message should disappear
+let confettiSpawnTime = 0;
+let tetrisMessageShown = false;
+let tetrisMessageStartTime = 0;
 
+// ===========================
 // DRAWING FUNCTIONS
+// ===========================
 
-// Draw the game board
 function drawBoard() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
       const color = board[row][col];
       if (color) {
         ctx.fillStyle = color;
         ctx.fillRect(
-          col * BLOCK_SIDE_LENGTH, 
-          row * BLOCK_SIDE_LENGTH, 
-          BLOCK_SIDE_LENGTH, 
+          col * BLOCK_SIDE_LENGTH,
+          row * BLOCK_SIDE_LENGTH,
+          BLOCK_SIDE_LENGTH,
           BLOCK_SIDE_LENGTH
         );
       }
@@ -48,22 +65,17 @@ function drawBoard() {
   }
 }
 
-// Draw the current piece and its shadow
 function drawPiece() {
   if (!currentPiece) return;
-
-  // Draw the shadow first (gray and translucent)
   drawShadowPiece();
-
-  // Draw the actual piece
   currentPiece.shape.forEach((row, rIdx) => {
     row.forEach((cell, cIdx) => {
       if (cell) {
         ctx.fillStyle = currentPiece.color;
         ctx.fillRect(
-          (currentPiece.x + cIdx) * BLOCK_SIDE_LENGTH, 
-          (currentPiece.y + rIdx) * BLOCK_SIDE_LENGTH, 
-          BLOCK_SIDE_LENGTH, 
+          (currentPiece.x + cIdx) * BLOCK_SIDE_LENGTH,
+          (currentPiece.y + rIdx) * BLOCK_SIDE_LENGTH,
+          BLOCK_SIDE_LENGTH,
           BLOCK_SIDE_LENGTH
         );
       }
@@ -71,28 +83,21 @@ function drawPiece() {
   });
 }
 
-// Draw the shadow piece
 function drawShadowPiece() {
   if (!currentPiece) return;
-
-  // Copy the current piece for simulating the shadow
   const shadowPiece = { ...currentPiece, y: currentPiece.y };
-  
-  // Move the shadow piece down until it collides with the board
   while (!checkCollisionAt(shadowPiece)) {
     shadowPiece.y++;
   }
-  shadowPiece.y--;  // Step back to the last valid position
-
-  // Draw the shadow piece (gray with transparency)
+  shadowPiece.y--; // Last valid position
   shadowPiece.shape.forEach((row, rIdx) => {
     row.forEach((cell, cIdx) => {
       if (cell) {
-        ctx.fillStyle = 'rgba(169, 169, 169, 0.5)'; 
+        ctx.fillStyle = 'rgba(169, 169, 169, 0.5)';
         ctx.fillRect(
-          (shadowPiece.x + cIdx) * BLOCK_SIDE_LENGTH, 
-          (shadowPiece.y + rIdx) * BLOCK_SIDE_LENGTH, 
-          BLOCK_SIDE_LENGTH, 
+          (shadowPiece.x + cIdx) * BLOCK_SIDE_LENGTH,
+          (shadowPiece.y + rIdx) * BLOCK_SIDE_LENGTH,
+          BLOCK_SIDE_LENGTH,
           BLOCK_SIDE_LENGTH
         );
       }
@@ -100,29 +105,20 @@ function drawShadowPiece() {
   });
 }
 
-// Draw the next piece preview on its canvas
 function drawNextPiece() {
   if (!nextPiece) return;
-  
-  // Clear the next piece canvas
   nextCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
-  
-  // Optionally, draw a border around the preview area
+  // Optional: draw a border around the preview area
   nextCtx.strokeStyle = "#000";
   nextCtx.strokeRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
   
   const shape = nextPiece.shape;
   const rows = shape.length;
   const cols = shape[0].length;
-  
-  // Use the same block size as the main game
   const previewBlockSize = BLOCK_SIDE_LENGTH;
-  
-  // Center the next piece in the preview canvas
   const offsetX = (nextPieceCanvas.width - cols * previewBlockSize) / 2;
   const offsetY = (nextPieceCanvas.height - rows * previewBlockSize) / 2;
   
-  // Draw each block of the next piece
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (shape[r][c]) {
@@ -138,20 +134,17 @@ function drawNextPiece() {
   }
 }
 
-// COLLISION CHECK
+// ===========================
+// COLLISION CHECK FUNCTIONS
+// ===========================
 
-// Check collision at a hypothetical piece position
 function checkCollisionAt(piece) {
   for (let row = 0; row < piece.shape.length; row++) {
     for (let col = 0; col < piece.shape[row].length; col++) {
       if (piece.shape[row][col]) {
         const newX = piece.x + col;
         const newY = piece.y + row;
-        if (
-          newX < 0 || newX >= COLS || 
-          newY >= ROWS || 
-          board[newY][newX]
-        ) {
+        if (newX < 0 || newX >= COLS || newY >= ROWS || board[newY][newX]) {
           return true;
         }
       }
@@ -160,14 +153,14 @@ function checkCollisionAt(piece) {
   return false;
 }
 
-// Check collision for the current piece
 function checkCollision() {
   return checkCollisionAt(currentPiece);
 }
 
+// ===========================
 // PIECE GENERATION
+// ===========================
 
-// Generate a new piece
 function generatePiece() {
   const idx = Math.floor(Math.random() * SHAPES.length);
   return {
@@ -178,39 +171,34 @@ function generatePiece() {
   };
 }
 
-// PIECE PLACEMENT AND LINES
+// ===========================
+// PIECE PLACEMENT & LINE CLEARING
+// ===========================
 
-// Move piece down
 function movePieceDown() {
-  if (gameOver) return;  // Prevent moving if the game is over
+  if (gameOver) return;
   currentPiece.y++;
   if (checkCollision()) {
     currentPiece.y--;
     placePiece();
     clearLines();
-    // Promote the next piece to be the current piece,
-    // then generate a new next piece and update the preview
     currentPiece = nextPiece;
     nextPiece = generatePiece();
     drawNextPiece();
     if (checkCollision()) {
-      gameOver = true; // End the game if new piece collides on spawn
+      gameOver = true;
     }
   }
 }
 
-// Drop piece down instantly
 function dropPieceDown() {
-  if (gameOver) return; 
-
+  if (gameOver) return;
   while (!checkCollision()) {
     currentPiece.y++;
   }
   currentPiece.y--;
-
   placePiece();
   clearLines();
-  // Promote the next piece and update the preview
   currentPiece = nextPiece;
   nextPiece = generatePiece();
   drawNextPiece();
@@ -219,7 +207,6 @@ function dropPieceDown() {
   }
 }
 
-// Place the current piece onto the board
 function placePiece() {
   currentPiece.shape.forEach((row, rIdx) => {
     row.forEach((cell, cIdx) => {
@@ -230,7 +217,6 @@ function placePiece() {
   });
 }
 
-// Clear completed lines and update score
 function clearLines() {
   let linesCleared = 0;
   for (let row = ROWS - 1; row >= 0; row--) {
@@ -245,19 +231,19 @@ function clearLines() {
   if (linesCleared === 4) {
     launchConfetti();
     showTetrisMessage();
-    score += 800; // Tetris bonus
+    score += 800;
     drawScore();
   }
 }
 
+// ===========================
 // GRID DRAWING
+// ===========================
 
-// Draw the grid lines on the canvas
 function drawGrid() {
   ctx.beginPath();
-  ctx.strokeStyle = '#555'; // Grid line color
-  ctx.lineWidth = 1;        // Grid line thickness
-
+  ctx.strokeStyle = '#555';
+  ctx.lineWidth = 1;
   for (let col = 0; col <= COLS; col++) {
     ctx.moveTo(col * BLOCK_SIDE_LENGTH, 0);
     ctx.lineTo(col * BLOCK_SIDE_LENGTH, ROWS * BLOCK_SIDE_LENGTH);
@@ -269,7 +255,9 @@ function drawGrid() {
   ctx.stroke();
 }
 
-// SCORE AND MESSAGES
+// ===========================
+// SCORE & MESSAGES
+// ===========================
 
 function showTetrisMessage() {
   if (!tetrisMessageShown) {
@@ -290,7 +278,9 @@ function drawScore() {
   document.getElementById("high-score").innerText = "High Score: " + highScore;
 }
 
-// GAME LOOP AND CONFETTI
+// ===========================
+// GAME LOOP & CONFETTI
+// ===========================
 
 function gameLoop() {
   if (gameOver) {
@@ -318,6 +308,11 @@ function gameLoop() {
     ctx.textAlign = 'center';
     ctx.fillText('Tetris! +800', canvas.width / 2, canvas.height / 2);
   }
+
+  // Gradually decrease the interval for faster piece movement, but never below 100ms
+  currentGameClock = Math.max(100, currentGameClock * speedIncreaseFactor);
+  clearInterval(gameInterval);
+  gameInterval = setInterval(gameLoop, currentGameClock);
 }
 
 function launchConfetti() {
@@ -352,16 +347,19 @@ function updateConfetti() {
   }
 }
 
+// ===========================
+// OTHER BUTTONS & INPUT
+// ===========================
 const switchBtn = document.getElementById('switch-mode-button');
 if (switchBtn) {
   switchBtn.addEventListener('click', function() {
-    window.location.href = "http://127.0.0.1:5501/Main%20Tetris/index.html";
+    window.location.href = "http://127.0.0.1:5502/Main%20Tetris/index.html";
   });
 }
 
-// Rotate function (disables rotation if collision occurs)
+// Rotate function (with collision check and undo if necessary)
 function rotatePiece(undo = false) {
-  const originalShape = JSON.parse(JSON.stringify(currentPiece.shape)); // Deep copy
+  const originalShape = JSON.parse(JSON.stringify(currentPiece.shape));
   currentPiece.shape = currentPiece.shape[0].map((_, idx) =>
     currentPiece.shape.map(row => row[idx]).reverse()
   );
@@ -369,18 +367,22 @@ function rotatePiece(undo = false) {
     if (undo) {
       currentPiece.shape = originalShape;
     } else {
-      rotatePiece(true); // Undo rotation
+      rotatePiece(true);
     }
   }
 }
 
-// Initialize game
+// ===========================
+// GAME INITIALIZATION
+// ===========================
 function startGame() {
   clearInterval(gameInterval);
   board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   currentPiece = generatePiece();
-  // Initialize nextPiece and immediately draw its preview
   nextPiece = generatePiece();
+  // Quick visual reset: immediately redraw board, grid, and next piece preview
+  drawBoard();
+  drawGrid();
   drawNextPiece();
   score = 0;
   gameOver = false;
@@ -388,41 +390,67 @@ function startGame() {
   confettiSpawnTime = Date.now();
   tetrisMessageShown = false;
   drawScore();
-  gameInterval = setInterval(gameLoop, GAME_CLOCK);
+  
+  // Reset game speed
+  currentGameClock = GAME_CLOCK;
+  gameInterval = setInterval(gameLoop, currentGameClock);
 }
 
 startGame();
 
-// User Input
+// ===========================
+// USER INPUT
+// ===========================
 document.addEventListener("keydown", (event) => {
-  if (gameOver) return; // Prevent key actions if game is over
-
+  if (gameOver) return;
   switch (event.key) {
-    case "a": // left (WASD)
+    case "a":
     case "A":
     case "ArrowLeft":
       currentPiece.x--;
       if (checkCollision()) currentPiece.x++;
       break;
-    case "d": // right (WASD)
+    case "d":
     case "D":
     case "ArrowRight":
       currentPiece.x++;
       if (checkCollision()) currentPiece.x--;
       break;
-    case "s": // drop (WASD)
-    case "S": 
+    case "s":
+    case "S":
     case "ArrowDown":
       dropPieceDown();
       break;
-    case "w": // rotate (WASD)
+    case "w":
     case "W":
     case "ArrowUp":
       rotatePiece();
       break;
   }
-
   drawBoard();
   drawGrid();
   drawPiece();
+});
+
+// ===========================
+// GEAR BUTTON & DROPDOWN LOGIC
+// ===========================
+const gearButton = document.getElementById("gear-button");
+const buttonDropdown = document.getElementById("button-dropdown");
+const overlay = document.getElementById("overlay");
+gearButton.style.fontSize = "70px";
+gearButton.addEventListener("click", function (event) {
+  event.stopPropagation();
+  gearButton.classList.add("spin");
+  setTimeout(() => {
+    gearButton.classList.remove("spin");
+    buttonDropdown.classList.toggle("active");
+    overlay.classList.toggle("active");
+  }, 500);
+});
+document.addEventListener("click", function(event) {
+  if (!gearButton.contains(event.target) && !buttonDropdown.contains(event.target)) {
+    buttonDropdown.classList.remove("active");
+    overlay.classList.remove("active");
+  }
 });

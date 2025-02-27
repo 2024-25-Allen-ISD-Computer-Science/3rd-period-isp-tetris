@@ -8,78 +8,90 @@ body {
     margin: 0;
     flex-direction: column;
     font-family: Arial, sans-serif;
-}
-
-#full-game {
-    align-content: center;
-    padding-right: 205px;
-}
-
-/* Main container to center the game and button container horizontally */
-#main-container {
-    display: flex;
-    flex-direction: row; /* Arrange items horizontally */
-    align-items: flex-start; /* Align items to the top */
+  }
+  
+  /* Full game section */
+  #full-game {
+    position: relative; /* Enables absolute positioning within */
     width: 100%;
-}
-
-/* Button container with stacked buttons */
-#button-container {
-    margin-top: 300px;
+  }
+  
+  /* Main container to center the game horizontally */
+  #main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center; /* Center children horizontally */
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  /* Game layout settings */
+  #game-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;  /* Button spacing */
-    margin-right: 10px; /* Spacing between buttons and game area */
-}
-
-/* Game layout settings */
-#game-container {
+    margin: 0; /* Keep it centered */
+  }
+  
+  /* Button container for the gear button */
+  #button-container {
+    position: absolute;
+    /* 
+       Calculate left offset:
+       - 50% centers the container,
+       - subtract half the game width (300px / 2 = 150px)
+       - subtract an extra offset (e.g., 70px) so the gear sits just to the left of the game.
+    */
+    left: calc(50% - 150px - 70px);
+    top: 270px;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-/* Score container: display scores side by side */
-.score-container {
+  }
+  
+  /* ====== Game Canvas & Score Styles ====== */
+  
+  /* Score container: display scores side by side */
+  .score-container {
     display: flex;
     justify-content: center;
-    gap: 10px;  /* Gap between score boxes */
+    gap: 10px;
     margin-bottom: 10px;
-}
-
-/* Score box styling */
-.score-box {
-    white-space: nowrap;  /* Prevent the text from wrapping */
+  }
+  
+  /* Score box styling */
+  .score-box {
+    white-space: nowrap;
     font-size: 18px;
     font-weight: bold;
     text-align: center;
-    min-width: 150px;  /* Minimum width for each score box */
+    min-width: 150px;
     padding: 7px;
     background-color: #333;
     color: #fff;
     border-radius: 5px;
     margin-top: 8px;
-}
-
-/* Container for the game canvas; this container is centered */
-#game-canvas-container {
+  }
+  
+  /* Container for the game canvas; centered */
+  #game-canvas-container {
     position: relative;
-    width: 300px; /* Match game canvas width */
+    width: 300px;
     margin: 0 auto;
-}
-
-/* Canvas styling for the game board */
-#game-canvas {
+  }
+  
+  /* Canvas styling for the game board */
+  #game-canvas {
     display: block;
     width: 300px;
     height: 600px;
     border: 5px solid white;
     background-color: black;
-}
-
-
-#next-piece-canvas {
+    margin-bottom: 50px;
+  }
+  
+  #next-piece-canvas {
     position: absolute;
     top: 50px;
     left: 310px; /* 300px (game canvas width) + 10px gap */
@@ -87,24 +99,26 @@ body {
     height: 120px;
     border: 5px solid white;
     background-color: black;
-}
-
-/* Title styling */
-h1 {
+  }
+  
+  /* Title styling */
+  h1 {
     font-size: 55px;
     margin-bottom: 20px;
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
     margin: 0;
     text-align: center;
     z-index: 10;
-}
-
-/* Original button size */
-.button {
+  }
+  
+  /* ====== Button & Dropdown Styles ====== */
+  
+  /* General button styling */
+  .button {
     font-weight: bold;
     padding: 10px 20px;
     background-color: gray;
@@ -115,20 +129,22 @@ h1 {
     transition: 0.4s;
     width: 200px;
     height: auto;
-}
-
-.button:hover {
-    background-color: #000000;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .button:hover {
+    background-color: #000;
     color: white;
-}
-
-/* Dropdown menu styling */
-.dropdown {
+  }
+  
+  /* Dropdown menu styling for in-page dropdowns */
+  .dropdown {
     position: relative;
     display: inline-block;
-}
-
-.dropdown-content {
+  }
+  
+  .dropdown-content {
     text-align: center;
     display: none;
     position: absolute;
@@ -137,25 +153,25 @@ h1 {
     min-width: 100%;
     max-width: 175px;
     z-index: 1;
-}
-
-.dropdown-content a {
+  }
+  
+  .dropdown-content a {
     color: black;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
-}
-
-.dropdown-content a:hover {
+  }
+  
+  .dropdown-content a:hover {
     background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
+  }
+  
+  .dropdown:hover .dropdown-content {
     display: block;
-}
-
-/* Reset button styling */
-#reset-button {
+  }
+  
+  /* Reset button styling */
+  #reset-button {
     font-weight: bold;
     padding: 10px 20px;
     font-size: 16px;
@@ -164,43 +180,43 @@ h1 {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     transition: background-color 0.3s;
     margin-top: 5px;
     margin-bottom: 7px;
-}
-
-#reset-button:hover {
+  }
+  
+  #reset-button:hover {
     background-color: #042f5e;
-}
-
-.dropdown .dropdown-content button#double-speed {
+  }
+  
+  .dropdown .dropdown-content button#double-speed {
     background-color: #f0f0f0;
     color: #333;
     padding: 10px 15px;
     border: 1px solid #ccc;
     cursor: pointer;
     margin-top: 20px;
-}
-
-.dropdown .dropdown-content button#double-speed:hover {
+  }
+  
+  .dropdown .dropdown-content button#double-speed:hover {
     background-color: #ddd;
-}
-
-.dropdown .dropdown-content button#normal-speed {
+  }
+  
+  .dropdown .dropdown-content button#normal-speed {
     background-color: #f0f0f0;
     color: #333;
     padding: 10px 15px;
     border: 1px solid #ccc;
     cursor: pointer;
-}
-
-.dropdown .dropdown-content button#normal-speed:hover {
+  }
+  
+  .dropdown .dropdown-content button#normal-speed:hover {
     background-color: #ddd;
-}
-
-/* Music control button styling */
-#music-control-button {
+  }
+  
+  /* Music control button styling */
+  #music-control-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -211,17 +227,90 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-#music-control-button:hover {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  
+  #music-control-button:hover {
     background-color: #44bd32;
-}
-
-/* Apply box-sizing globally for consistency - 
-so I don’t have to manually calculate extra space for padding and borders */
-*,
-*::before,
-*::after {
+  }
+  
+  /* When active, display the gear dropdown */
+  #button-dropdown.active {
+    display: block;
+  }
+  
+  /* Override button styles for buttons inside the gear dropdown.
+     This makes them have a white background with gray text, as originally desired. */
+  
+  #overlay.active {
+    display: block;
+  }
+  
+  /* ====== Global Box-Sizing ====== */
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
-}
+  }
+  
+  /* ====== Gear Button Styling ====== */
+  .gear-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  /* Overlay styling
+  #overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: none;
+  z-index: 10;
+  } */
+
+  #button-dropdown .button {
+    background-color: white;
+    color: rgb(74, 74, 74);
+    border: none;
+    width: 200px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    transition: 0.4s;
+  }
+  
+  #button-dropdown .button:hover {
+    background-color: #ddd;
+    color: black;
+  }
+
+  #button-dropdown {
+  display: none; /* Hidden by default */
+  position: absolute;
+  background: #242424;  /* Dark background */
+  padding: 15px;  
+  border-radius: 5px;
+  z-index: 20;
+  min-width: 300px;  /* Ensures the popup covers the buttons */
+  width: auto;
+  }
+  .gear-button:hover {
+    color: #007bff;
+  }
+  
+  /* Spin animation keyframes */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  
+  /* Class trigger the spin animation */
+  .spin {
+    animation: spin 0.5s ease;
+  }
+
