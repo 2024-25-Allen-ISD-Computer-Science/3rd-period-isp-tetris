@@ -7,6 +7,56 @@
        <meta name="viewport" content="width=device-width, initial-scale=1">
        <link rel="stylesheet" href="tetris.css">
        <title>Tetris Game</title>
+       <style>
+           /* Styling for the Pause/Play Button */
+           #music-control-button {
+               position: fixed;
+               bottom: 20px;
+               right: 20px;
+               padding: 10px 20px;
+               background-color: #4cd137;
+               color: white;
+               border: none;
+               border-radius: 5px;
+               cursor: pointer;
+               font-size: 16px;
+               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+           }
+
+           #music-control-button:hover {
+               background-color: #44bd32;
+           }
+
+           /* Dropdown Styling */
+           .dropdown {
+               position: relative;
+               display: inline-block;
+           }
+
+           .dropdown-content {
+               display: none;
+               position: absolute;
+               background-color: #f9f9f9;
+               min-width: 160px;
+               box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+               z-index: 1;
+           }
+
+           .dropdown-content a {
+               color: black;
+               padding: 8px 12px;
+               text-decoration: none;
+               display: block;
+           }
+
+           .dropdown-content a:hover {
+               background-color: #f1f1f1;
+           }
+
+           .dropdown:hover .dropdown-content {
+               display: block;
+           }
+       </style>
    </head>
    <body>
        <!-- Background Music -->
@@ -14,6 +64,29 @@
            <source src="BlockGame.mp3" type="audio/mpeg">
            Your browser does not support the audio element.
        </audio>
+
+       <!-- Christmas Music -->
+       <audio id="christmas-music" loop>
+           <source src="CHRISTMAS.mp3" type="audio/mpeg">
+           Your browser does not support the audio element.
+       </audio>
+
+              <!-- Fall Music -->
+              <audio id="Fall-music" loop>
+                <source src="FALLMUSIC.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+
+                   <!-- Summer Music -->
+       <audio id="summer-music" loop>
+        <source src="SUMMERMUSIC.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="Spring-music" loop>
+        <source src="SPRING.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
        <!-- Title Section -->
        <h1>
@@ -24,30 +97,40 @@
            <span class="tetris-letter" style="color: #8e44ad;">I</span>
            <span class="tetris-letter" style="color: #f39c12;">S</span>
        </h1>
-            <!-- Overlay for dimming the background -->
-        <div id="overlay"></div>
-        <div id="spacer"></div>
 
-       <!-- Full Game Section -->
-       <div id="full-game">
-           <div id="main-container">
+       <div id="spacer"></div>
 
-               <!-- Button container with Gear Icon -->
+         <!-- Full Game Section -->
+         <div id="full-game">
+            <div id="main-container">
+                <!-- Button container on the left -->
                 <div id="button-container">
-                    <button id="gear-button" class="gear-button">⚙</button>
-                    <div id="button-dropdown" class="dropdown-content">
-                        <button id="switch-mode-button" class="button">Crazy Blocks</button>
-                        <div class="dropdown">
-                            <button id="toggle-mode" class="button">Change Game Mode</button>
-                            <div class="dropdown-content">
-                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Ultimate%20Speed/index.html">Ultimate Speed</a>
-                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Crazy%20Shapes/index.html">Crazy Shapes</a>
-                                <a href="http://127.0.0.1:5502/Tetris%20Gamemodes/Speeding%20Up/Index.html">Speeding Up</a>
-                            </div>
+                    <button id="switch-mode-button" class="button">Crazy Blocks</button>
+ 
+                    <div class="dropdown">
+                        <button id="toggle-mode" class="button">Change Game Mode</button>
+                        <div class="dropdown-content">
+                            <!-- 2X Speed Game Mode -->
+                            <a href="http://127.0.0.1:5513/Tetris%20Ultimate%20Speed/index.html">Ultimate Speed</a>
                         </div>
-                        <button id="theme-button" class="button">Block Themes</button>
-                        <button id="theme-button" class="button">Background Themes</button>
-                        <button id="reset-button" class="button">Reset Game</button>
+                    </div>
+ 
+                    <!-- Theme Dropdown -->
+                    <div class="dropdown">
+                        <button id="theme-button" class="button">Change Theme</button>
+                        <div class="dropdown-content">
+                            <a href="#" id="theme-red">Red</a>
+                            <a href="#" id="theme-blue">Blue</a>
+                            <a href="#" id="theme-green">Green</a>
+                            <a href="#" id="theme-reset">Reset</a>
+                            <a href="#" id="theme-christmas">Christmas</a>
+                            <a href="#" id="theme-fall">Fall</a>
+                            <a href="#" id="theme-summer">Summer</a>
+                            <a href="#" id="theme-spring">Spring</a>
+ 
+
+ 
+                        </div>
                     </div>
                 </div>
                <!-- Game container on the right -->
@@ -61,17 +144,241 @@
                        <canvas id="game-canvas" width="300" height="600"></canvas>
                        <canvas id="next-piece-canvas" width="120" height="120"></canvas>
                    </div>
+                   <button id="reset-button">Reset Game</button>
                </div>
            </div>
        </div>
 
        <!-- Music Control Button -->
        <button id="music-control-button">Pause Music</button>
+       
 
        <!-- Scripts -->
        <script src="./constants.js"></script>
        <script src="./piece.js"></script>
        <script src="./gamemodel.js"></script>
        <script src="./tetris.js"></script>
+
+       <script>
+        // Background music and control button logic
+        const music = document.getElementById('background-music');
+        const christmasMusic = document.getElementById('christmas-music');
+        const musicControlButton = document.getElementById('music-control-button');
+
+        // Set initial volume
+        music.volume = 0.5;
+        christmasMusic.volume = 0.5;
+
+        // Toggle music play/pause
+        musicControlButton.addEventListener('click', () => {
+            if (music.paused && christmasMusic.paused && FallMusic.paused && summerMusic.paused && springMusic.paused) {
+                music.play();
+                musicControlButton.textContent = 'Pause Music';
+            } else {
+                music.pause();
+                christmasMusic.pause();
+                FallMusic.pause();
+                summerMusic.pause();
+                musicControlButton.textContent = 'Play Music';
+            }
+            
+
+
+        });
+
+        // Theme logic
+        const COLORS_RED = ['#FF0000', '#FF4D4D', '#FF9999', '#FF6666', '#FFB3B3', '#FF8080', '#FF3333'];
+        const COLORS_GREEN = ['#00FF00', '#4DFF4D', '#99FF99', '#66FF66', '#B3FFB3', '#80FF80', '#33FF33'];
+        const COLORS_BLUE = ['#0000FF', '#4D4DFF', '#9999FF', '#6666FF', '#B3B3FF', '#8080FF', '#3333FF'];
+        const COLORS_CHRISTMAS = ['#FF0000', '#00FF00', '#FFFFFF', '#FF0000', '#00FF00', '#FFFFFF', '#FF0000'];
+        const COLORS_FALL = ['#D2691E', '#FF8C00', '#FFD700', '#8B4513', '#A52A2A', '#CD853F', '#F4A460'];
+        const COLORS_SUMMER = ['#00FFFF', '#FFD700', '#FF69B4', '#FFA500', '#FF4500', '#87CEEB', '#32CD32'];
+        const COLORS_SPRING = ['#FFB6C1', '#98FB98', '#FFDAB9', '#E6E6FA', '#ADD8E6', '#F0E68C', '#D8BFD8'];
+
+        const themeRedButton = document.getElementById('theme-red');
+        const themeBlueButton = document.getElementById('theme-blue');
+        const themeGreenButton = document.getElementById('theme-green');
+        const themeResetButton = document.getElementById('theme-reset');
+        const themeChristmasButton = document.getElementById('theme-christmas');
+        const themeFallButton = document.getElementById('theme-fall');
+        const themeSummerButton = document.getElementById('theme-summer');
+        const themeSpringButton = document.getElementById('theme-spring');
+
+
+        themeRedButton.addEventListener('click', () => {
+            updateColors(COLORS_RED);
+            playDefaultMusic();
+            document.body.style.backgroundImage = "url('RED.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+        });
+
+        themeBlueButton.addEventListener('click', () => {
+            updateColors(COLORS_BLUE);
+            playDefaultMusic();
+            document.body.style.backgroundImage = "url('BLUE.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+        });
+
+        themeGreenButton.addEventListener('click', () => {
+            updateColors(COLORS_GREEN);
+            playDefaultMusic();
+            document.body.style.backgroundImage = "url('GREEN.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+            
+        });
+
+        themeResetButton.addEventListener('click', () => {
+            updateColors(COLORS);
+            playDefaultMusic();
+            document.body.style.backgroundImage = "url('.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+            
+        });
+
+        themeChristmasButton.addEventListener('click', () => {
+            updateColors(COLORS_CHRISTMAS);
+            playChristmasMusic();
+            document.body.style.backgroundImage = "url('CHRISTMAS.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+        });
+
+        
+        themeSpringButton.addEventListener('click', () => {
+            updateColors(COLORS_SPRING);
+            playChristmasMusic();
+            document.body.style.backgroundImage = "url('Spring.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+        });
+
+
+
+        function updateColors(newColors) {
+            // Ensure the colors array is reset properly
+            COLORS.length = 0;
+            newColors.forEach(color => COLORS.push(color));
+
+            // Restore visibility of all blocks
+            document.querySelectorAll('.block').forEach(block => {
+                block.style.visibility = 'visible';
+            });
+        }
+
+        
+           themeFallButton.addEventListener('click', () => {
+                updateColors(COLORS_FALL);
+            playFalltMusic();
+            document.body.style.backgroundImage = "url('FALL.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+});
+
+
+
+        themeSummerButton.addEventListener('click', () => {
+         updateColors(COLORS_SUMMER);
+        PlaySummerMusic();
+        document.body.style.backgroundImage = "url('BEACH.jpg')";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.backgroundPosition = "center";
+});
+
+        function playDefaultMusic() {
+            christmasMusic.pause();
+            christmasMusic.currentTime = 0;
+            music.play();
+             document.body.style.backgroundImage = "url('CHRISTMAS.jpg')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+        }
+
+        function playChristmasMusic() {
+            music.pause();
+            music.currentTime = 0;
+            christmasMusic.play();
+        }
+
+        // Get Fall and Summer Music Elements
+const fallMusic = document.getElementById('Fall-music');
+const summerMusic = document.getElementById('summer-music');
+
+// Set initial volume
+fallMusic.volume = 0.5;
+summerMusic.volume = 0.5;
+
+function playFallMusic() {
+    music.pause();
+    music.currentTime = 0;
+    christmasMusic.pause();
+    christmasMusic.currentTime = 0;
+    summerMusic.pause();
+    summerMusic.currentTime = 0;
+
+    fallMusic.play();
+}
+
+function playSummerMusic() {
+    music.pause();
+    music.currentTime = 0;
+    christmasMusic.pause();
+    christmasMusic.currentTime = 0;
+    fallMusic.pause();
+    fallMusic.currentTime = 0;
+
+    summerMusic.play();
+}
+
+// Update event listeners for Fall and Summer buttons
+themeFallButton.addEventListener('click', () => {
+    updateColors(COLORS_FALL);
+    playFallMusic();
+    document.body.style.backgroundImage = "url('FALL.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+});
+
+themeSummerButton.addEventListener('click', () => {
+    updateColors(COLORS_SUMMER);
+    playSummerMusic();
+    document.body.style.backgroundImage = "url('BEACH.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+});
+
+// Get Spring Music Element
+const SpringMusic = document.getElementById('Spring-music');
+
+// Set initial volume
+SpringMusic.volume = 0.5;
+
+function playSpringMusic() {
+    music.pause();
+    music.currentTime = 0;
+    christmasMusic.pause();
+    christmasMusic.currentTime = 0;
+    fallMusic.pause();
+    fallMusic.currentTime = 0;
+    summerMusic.pause();
+    summerMusic.currentTime = 0;
+
+    SpringMusic.play();
+}
+
+// Update event listener for Spring button
+themeSpringButton.addEventListener('click', () => {
+    updateColors(COLORS_SPRING);
+    playSpringMusic();
+    document.body.style.backgroundImage = "url('SPRING.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+});
+
+        
+    </script>
    </body>
 </html>
